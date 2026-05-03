@@ -139,6 +139,35 @@ describe('Local 2P privacy + handoff (CP5)', () => {
     expect(screen.queryByLabelText(/player 2 fleet board/i)).not.toBeInTheDocument();
   });
 
+  it("Opponent scoreboard sublabel is NOT 'Player 2' on Player 2's turn (regression: it was incorrectly hardcoded)", async () => {
+    startLocal2P();
+    p1RandomConfirm();
+    await clickReady();
+    p2RandomConfirm();
+    await clickReady();
+    // P1 fires once.
+    fireEvent.click(targetingCells()[0]!);
+    await act(async () => {
+      await new Promise((res) => setTimeout(res, 0));
+    });
+    // Handoff to P2.
+    await clickReady();
+    // Now it's P2's turn. The scoreboard shows them=P1; the sublabel must
+    // NOT be the hardcoded "Player 2" — that would mislabel P1.
+    const scoreboardLabels = screen.getAllByText(/^Player [12]$/);
+    // P2's name is in the "You" slot (their own name), P1's name is in the
+    // opponent slot. The opponent sublabel "Player 2" must not appear.
+    const sublabelTexts = Array.from(document.querySelectorAll('span')).map(
+      (s) => s.textContent?.trim() ?? '',
+    );
+    // The "Player 2" string can appear only as a player NAME, not as a
+    // sublabel. After fix the sublabel reads "Opponent". Either way, "Player 2"
+    // should appear at most once on the scoreboard (as P2's own name).
+    expect(scoreboardLabels.length).toBeGreaterThan(0);
+    // Sanity: at least one explicit "Opponent" sublabel is now present.
+    expect(sublabelTexts.includes('Opponent')).toBe(true);
+  });
+
   it('A handoff screen appears between every turn (#40)', async () => {
     startLocal2P();
     p1RandomConfirm();

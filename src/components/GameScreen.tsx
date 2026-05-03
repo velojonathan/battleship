@@ -184,7 +184,7 @@ export function GameScreen({
             className={`${styles.scoreSlot} ${!myTurn ? styles.scoreSlotActive : ''}`}
           >
             <span className={styles.scoreName}>{them.name}</span>
-            <span className={styles.scoreSub}>{them.kind === 'ai' ? state.difficulty : 'Player 2'}</span>
+            <span className={styles.scoreSub}>{them.kind === 'ai' ? state.difficulty : 'Opponent'}</span>
           </span>
         </div>
         <div
