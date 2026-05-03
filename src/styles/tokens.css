@@ -1,0 +1,60 @@
+/* Design tokens for the naval command theme. */
+:root {
+  color-scheme: dark;
+
+  /* Palette */
+  --color-deep: #040a18;
+  --color-ocean: #061222;
+  --color-ocean-2: #0a1c33;
+  --color-ocean-3: #0e2a4f;
+  --color-bridge: #14304d;
+  --color-steel: #233f5e;
+  --color-mist: #b9d4e8;
+  --color-glow: #7fdce0;
+  --color-glow-strong: #c1f5fa;
+  --color-amber: #ffb547;
+  --color-hit: #ff5e5e;
+  --color-miss: #b9d4e8;
+  --color-sunk: #ffb547;
+  --color-grid: rgba(127, 220, 224, 0.16);
+  --color-grid-strong: rgba(127, 220, 224, 0.32);
+  --color-panel: rgba(10, 28, 51, 0.55);
+  --color-panel-border: rgba(127, 220, 224, 0.22);
+
+  /* Typography */
+  --font-display: 'Georgia', 'Times New Roman', ui-serif, serif;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono:
+    ui-monospace, 'SFMono-Regular', Menlo, Monaco, 'Cascadia Mono', 'Liberation Mono',
+    monospace;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Radii */
+  --radius-1: 4px;
+  --radius-2: 8px;
+  --radius-3: 14px;
+
+  /* Motion */
+  --motion-fast: 120ms;
+  --motion-medium: 220ms;
+  --motion-slow: 380ms;
+
+  /* Layout */
+  --board-cell: clamp(28px, 4.6vw, 44px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-medium: 0ms;
+    --motion-slow: 0ms;
+  }
+}
