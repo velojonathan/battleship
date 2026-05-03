@@ -1,10 +1,41 @@
-import { type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
+import { useCallback, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
 import { coordKey } from '../game/coordinates';
 import type { Coord, OwnBoard } from '../game/types';
 import { Cell, type CellState } from './Cell';
 import styles from './Board.module.css';
 
 const COLUMN_LABELS = 'ABCDEFGHIJ'.split('');
+
+/**
+ * Move keyboard focus from `from` toward `dir`, wrapping to the next/previous
+ * row when needed. The board is queried via data-coord attributes so this
+ * works for both placement and game boards. Returns true if focus moved.
+ */
+function moveFocus(
+  fromEl: HTMLElement,
+  from: Coord,
+  dir: 'up' | 'down' | 'left' | 'right',
+  size: number,
+): boolean {
+  let { row, col } = from;
+  if (dir === 'up') row -= 1;
+  else if (dir === 'down') row += 1;
+  else if (dir === 'left') col -= 1;
+  else col += 1;
+  if (row < 0 || row >= size || col < 0 || col >= size) return false;
+  const grid = fromEl.closest('[role="grid"]') as HTMLElement | null;
+  if (!grid) return false;
+  const next = grid.querySelector<HTMLButtonElement>(
+    `button[data-coord="${row},${col}"]:not([disabled])`,
+  );
+  if (next) {
+    next.focus();
+    return true;
+  }
+  // If neighbor is disabled, try to step further in the same direction so
+  // the player can still skip past resolved cells.
+  return moveFocus(fromEl, { row, col }, dir, size);
+}
 
 export type BoardVariant = 'placement' | 'own' | 'targeting';
 
@@ -55,6 +86,31 @@ export function Board({
   const cols = Array.from({ length: size }, (_, i) => i);
   const variantClass =
     variant === 'targeting' ? styles.targeting : variant === 'own' ? styles.own : '';
+
+  // Keyboard navigation: arrow keys move focus to the neighboring cell.
+  // The user-supplied onCellKeyDown still runs first; if the user calls
+  // event.preventDefault we don't intercept the navigation either.
+  const handleCellKey = useCallback(
+    (coord: Coord, event: KeyboardEvent<HTMLButtonElement>) => {
+      onCellKeyDown?.(coord, event);
+      if (event.defaultPrevented) return;
+      const dir =
+        event.key === 'ArrowUp'
+          ? 'up'
+          : event.key === 'ArrowDown'
+            ? 'down'
+            : event.key === 'ArrowLeft'
+              ? 'left'
+              : event.key === 'ArrowRight'
+                ? 'right'
+                : null;
+      if (!dir) return;
+      const moved = moveFocus(event.currentTarget as HTMLElement, coord, dir, size);
+      if (moved) event.preventDefault();
+    },
+    [onCellKeyDown, size],
+  );
+
   return (
     <div
       className={[styles.board, variantClass, className].filter(Boolean).join(' ')}
@@ -88,7 +144,7 @@ export function Board({
           onCellClick={onCellClick}
           onCellPointerEnter={onCellPointerEnter}
           onCellPointerLeave={onCellPointerLeave}
-          onCellKeyDown={onCellKeyDown}
+          onCellKeyDown={handleCellKey}
         />
       ))}
     </div>
