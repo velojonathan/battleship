@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import type { Action, GameState, HandoffReason } from '../game/types';
+import { allShipsPlaced } from '../game/placement';
+import type { Action, GameState } from '../game/types';
 import styles from './HandoffScreen.module.css';
 
 export interface HandoffScreenProps {
@@ -7,19 +8,35 @@ export interface HandoffScreenProps {
   dispatch: (action: Action) => void;
 }
 
-const REASON_KICKER: Record<HandoffReason, string> = {
-  setup: 'Setup',
-  turn: 'Battle',
+/**
+ * Handoff is rendered for two semantically different transitions that the
+ * engine collectively models with `handoffReason`:
+ *  - 'pre-place'  : next player still needs to place their fleet
+ *                   (handoffReason === 'setup' AND that player's fleet is
+ *                    not yet fully placed).
+ *  - 'pre-battle' : both fleets are placed; next press starts/continues firing
+ *                   (handoffReason === 'turn', OR 'setup' but the next
+ *                    player's fleet is already fully placed — which the engine
+ *                    emits after P2 finishes setup, transitioning straight
+ *                    into the in-progress phase on CONFIRM_READY).
+ */
+type DisplayMode = 'pre-place' | 'pre-battle';
+
+const KICKER: Record<DisplayMode, string> = {
+  'pre-place': 'Setup',
+  'pre-battle': 'Battle',
 };
 
-const REASON_HEADLINE: Record<HandoffReason, (name: string) => string> = {
-  setup: (name) => `${name}, place your fleet`,
-  turn: (name) => `${name}, fire when ready`,
+const HEADLINE: Record<DisplayMode, (name: string) => string> = {
+  'pre-place': (name) => `${name}, place your fleet`,
+  'pre-battle': (name) => `${name}, fire when ready`,
 };
 
-const REASON_HELP: Record<HandoffReason, string> = {
-  setup: 'Pass the device to the next player privately. They will place their fleet hidden from you.',
-  turn: 'Pass the device to the next player privately. The board for the previous player has been cleared from view.',
+const HELP: Record<DisplayMode, string> = {
+  'pre-place':
+    'Pass the device to the next player privately. They will place their fleet hidden from you.',
+  'pre-battle':
+    'Pass the device to the next player privately. The board for the previous player has been cleared from view.',
 };
 
 /**
@@ -48,11 +65,19 @@ export function HandoffScreen({ state, dispatch }: HandoffScreenProps): JSX.Elem
     dispatch({ type: 'CONFIRM_READY' });
   };
 
-  // Defensive: if reason or pendingHandoffTo is somehow null (shouldn't happen),
-  // render a generic "ready" prompt that still completes the handoff.
-  const kicker = reason ? REASON_KICKER[reason] : 'Handoff';
-  const headline = reason ? REASON_HEADLINE[reason](nextName) : `${nextName}, ready?`;
-  const help = reason ? REASON_HELP[reason] : 'Pass the device to the next player.';
+  // Resolve the display mode from engine state. The engine reuses
+  // handoffReason='setup' both for "you still need to place" AND for
+  // "P2 just finished placing, P1 is up to fire". Distinguish them by
+  // checking whether the next player's fleet is already placed.
+  const mode: DisplayMode | null = (() => {
+    if (!reason || !nextId) return null;
+    if (reason === 'turn') return 'pre-battle';
+    return allShipsPlaced(state.players[nextId].fleet) ? 'pre-battle' : 'pre-place';
+  })();
+
+  const kicker = mode ? KICKER[mode] : 'Handoff';
+  const headline = mode ? HEADLINE[mode](nextName) : `${nextName}, ready?`;
+  const help = mode ? HELP[mode] : 'Pass the device to the next player.';
 
   return (
     <section

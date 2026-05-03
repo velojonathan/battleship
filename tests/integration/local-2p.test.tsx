@@ -46,6 +46,25 @@ async function clickReady(): Promise<void> {
   });
 }
 
+describe('Local 2P home screen', () => {
+  it('Toggling Solo -> Local 2P -> Solo preserves a custom Player 1 name', () => {
+    render(<App aiThinkMs={0} resolveMs={0} />);
+    // Type a custom callsign while in Solo.
+    const p1Input = screen.getByLabelText(/player 1 name/i) as HTMLInputElement;
+    fireEvent.change(p1Input, { target: { value: 'Alice' } });
+    expect(p1Input.value).toBe('Alice');
+    // Toggle to Local 2P.
+    fireEvent.click(screen.getByRole('button', { name: /^local 2p/i }));
+    // P1 input must keep "Alice" — only P2 input is re-synced from engine.
+    const p1AfterToggle = screen.getByLabelText(/player 1 name/i) as HTMLInputElement;
+    expect(p1AfterToggle.value).toBe('Alice');
+    // Toggle back to Solo and back to 2P; "Alice" must still be there.
+    fireEvent.click(screen.getByRole('button', { name: /^solo/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^local 2p/i }));
+    expect((screen.getByLabelText(/player 1 name/i) as HTMLInputElement).value).toBe('Alice');
+  });
+});
+
 describe('Local 2P privacy + handoff (CP5)', () => {
   it('Setup handoff appears between Player 1 and Player 2 placements (#38)', async () => {
     startLocal2P();
@@ -85,6 +104,15 @@ describe('Local 2P privacy + handoff (CP5)', () => {
     // We should now be on a handoff back to P1 (start firing).
     expect(
       await screen.findByRole('dialog', { name: /handoff to/i }),
+    ).toBeInTheDocument();
+    // The post-setup handoff is to P1 to FIRE — the screen must not tell P1
+    // to "place your fleet" (that fleet is already placed). Regression test
+    // for Devin Review #5.1.
+    expect(
+      screen.queryByRole('heading', { level: 1, name: /place your fleet/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: /fire when ready/i }),
     ).toBeInTheDocument();
     await clickReady();
     // Now we're in-progress with P1 firing.

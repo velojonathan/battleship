@@ -29,17 +29,16 @@ export function HomeScreen({
   const [p2Name, setP2Name] = useState(state.players.p2.name);
 
   // When the user toggles between Solo and Local 2P, the engine swaps p2's
-  // identity (AI Commander <-> Player 2) and we must re-sync the local input
-  // states. Otherwise, a stale "AI Commander" sits in the p2 input and gets
-  // dispatched as the player's name when the user clicks Begin.
+  // identity (AI Commander <-> Player 2). Re-sync ONLY the p2 input so the
+  // local state matches the engine. P1 is never touched on SET_MODE, so we
+  // must NOT clobber whatever the user has typed there.
   const prevModeRef = useRef(state.mode);
   useEffect(() => {
     if (prevModeRef.current !== state.mode) {
-      setP1Name(state.players.p1.name);
       setP2Name(state.players.p2.name);
       prevModeRef.current = state.mode;
     }
-  }, [state.mode, state.players.p1.name, state.players.p2.name]);
+  }, [state.mode, state.players.p2.name]);
 
   const onSetMode = useCallback(
     (mode: Mode) => {
