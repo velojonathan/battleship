@@ -78,8 +78,9 @@ export default tseslint.config(
       ],
     },
   },
-  // React components must not import the engine reducer or rule modules directly:
-  // they must dispatch actions through hooks. (Public types from src/game are fine.)
+  // React components must not call the engine reducer or shot resolution rules
+  // directly: they must dispatch actions through hooks. (Pure query helpers like
+  // canPlaceShip / shipFootprint are fine — they read state, never mutate it.)
   {
     files: ['src/components/**/*.{ts,tsx}'],
     rules: {
@@ -88,7 +89,7 @@ export default tseslint.config(
         {
           patterns: [
             {
-              group: ['*/game/engine', '*/game/rules', '*/game/placement'],
+              group: ['*/game/engine', '*/game/rules'],
               message:
                 'Components must not call engine/rules directly. Dispatch actions via the useGame hook.',
             },
