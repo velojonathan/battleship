@@ -1,0 +1,96 @@
+.screen {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6, 32px);
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(50, 90, 140, 0.35), transparent 70%),
+    radial-gradient(900px 600px at 50% 120%, rgba(20, 60, 100, 0.5), transparent 60%),
+    var(--color-deep, #0a1828);
+}
+
+.card {
+  width: min(560px, 100%);
+  padding: var(--space-7, 40px) var(--space-6, 32px);
+  border-radius: var(--radius-lg, 16px);
+  background: rgba(8, 22, 36, 0.78);
+  border: 1px solid rgba(140, 180, 220, 0.18);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+}
+
+.kicker {
+  margin: 0;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent-soft, #6db8ff);
+  opacity: 0.9;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+  font-weight: 600;
+  color: var(--color-mist, #e6f0fa);
+  letter-spacing: 0.01em;
+}
+
+.help {
+  margin: 0;
+  color: var(--color-mist, #cfe7ef);
+  opacity: 0.78;
+  line-height: 1.55;
+  font-size: 0.98rem;
+}
+
+.button {
+  align-self: center;
+  margin-top: var(--space-3, 12px);
+  padding: 0.85rem 1.6rem;
+  border-radius: var(--radius-md, 12px);
+  border: 1px solid rgba(140, 180, 220, 0.32);
+  background: linear-gradient(
+    180deg,
+    rgba(60, 120, 180, 0.55) 0%,
+    rgba(30, 80, 140, 0.55) 100%
+  );
+  color: var(--color-mist, #e6f0fa);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 200ms ease, background 200ms ease;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 8px 22px rgba(0, 30, 60, 0.45);
+}
+
+.button:hover,
+.button:focus-visible {
+  outline: none;
+  background: linear-gradient(
+    180deg,
+    rgba(80, 150, 220, 0.65) 0%,
+    rgba(40, 100, 180, 0.65) 100%
+  );
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}
