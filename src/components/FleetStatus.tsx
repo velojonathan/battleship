@@ -1,5 +1,6 @@
 import { SHIP_NAME } from '../game/constants';
 import type { GameState, PlayerId, Ship, ShipId } from '../game/types';
+import { ShipSvg } from './ShipSvg';
 import styles from './FleetStatus.module.css';
 
 export interface FleetStatusProps {
@@ -69,30 +70,40 @@ export function FleetStatus({
         </span>
       </header>
       <ul className={styles.list}>
-        {derived.map((ship) => (
-          <li
-            key={ship.id}
-            className={`${styles.ship} ${ship.sunk ? styles.sunk : ''}`}
-            data-ship={ship.id}
-            data-sunk={ship.sunk ? 'true' : 'false'}
-          >
-            <span className={styles.name}>{SHIP_NAME[ship.id]}</span>
-            <span className={styles.cells} aria-hidden="true">
-              {Array.from({ length: ship.length }).map((_, i) => {
-                const damaged = reveal ? i < ship.hits : ship.sunk;
-                return (
-                  <span
-                    key={i}
-                    className={`${styles.cell} ${damaged ? styles.damaged : ''}`}
-                  />
-                );
-              })}
-            </span>
-            <span className={styles.label}>
-              {ship.sunk ? 'Sunk' : reveal ? `${ship.length - ship.hits}/${ship.length}` : 'Active'}
-            </span>
-          </li>
-        ))}
+        {derived.map((ship) => {
+          const visualState: 'pending' | 'placed' | 'damaged' | 'sunk' = ship.sunk
+            ? 'sunk'
+            : ship.hits > 0
+              ? 'damaged'
+              : 'placed';
+          return (
+            <li
+              key={ship.id}
+              className={`${styles.ship} ${ship.sunk ? styles.sunk : ''}`}
+              data-ship={ship.id}
+              data-sunk={ship.sunk ? 'true' : 'false'}
+            >
+              <span className={styles.silhouette} aria-hidden="true">
+                <ShipSvg shipId={ship.id} length={ship.length} state={visualState} width={18} />
+              </span>
+              <span className={styles.name}>{SHIP_NAME[ship.id]}</span>
+              <span className={styles.cells} aria-hidden="true">
+                {Array.from({ length: ship.length }).map((_, i) => {
+                  const damaged = reveal ? i < ship.hits : ship.sunk;
+                  return (
+                    <span
+                      key={i}
+                      className={`${styles.cell} ${damaged ? styles.damaged : ''}`}
+                    />
+                  );
+                })}
+              </span>
+              <span className={styles.label}>
+                {ship.sunk ? 'Sunk' : reveal ? `${ship.length - ship.hits}/${ship.length}` : 'Active'}
+              </span>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

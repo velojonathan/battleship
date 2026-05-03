@@ -1,4 +1,5 @@
 import type { Orientation, PlayerId, Ship, ShipId } from '../game/types';
+import { ShipSvg } from './ShipSvg';
 import styles from './ShipDock.module.css';
 
 export interface ShipDockProps {
@@ -64,14 +65,24 @@ export function ShipDock({
                   if (!isSelected) onSelectShip(ship.id);
                 }}
               >
-                <span>{ship.name}</span>
-                <span className={styles.length} aria-hidden="true">
-                  {Array.from({ length: ship.length }).map((_, i) => (
-                    <span
-                      key={i}
-                      className={`${styles.lengthDot} ${placed ? styles.placed : styles.empty}`}
-                    />
-                  ))}
+                <span className={styles.shipSilhouette} aria-hidden="true">
+                  <ShipSvg
+                    shipId={ship.id}
+                    length={ship.length}
+                    state={placed ? 'placed' : 'pending'}
+                    width={20}
+                  />
+                </span>
+                <span className={styles.shipMeta}>
+                  <span className={styles.shipName}>{ship.name}</span>
+                  <span className={styles.length} aria-hidden="true">
+                    {Array.from({ length: ship.length }).map((_, i) => (
+                      <span
+                        key={i}
+                        className={`${styles.lengthDot} ${placed ? styles.placed : styles.empty}`}
+                      />
+                    ))}
+                  </span>
                 </span>
                 <span className={`${styles.status} ${placed ? styles.placed : ''}`}>
                   {status}
