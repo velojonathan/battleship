@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fireEvent, render, screen, waitFor, act, within } from '@testing-library/react';
+import { fireEvent, render, screen, act, within } from '@testing-library/react';
 import App from '../../src/App';
 
 /**
