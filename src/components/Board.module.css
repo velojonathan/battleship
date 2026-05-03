@@ -106,8 +106,14 @@
   }
 }
 
-/* Cells stack above the overlay layers. */
-.board > * {
+/*
+ * Cells & labels need to sit above the absolutely-positioned overlay layers.
+ * IMPORTANT: this rule must NOT match .scanRing/.scanSweep/.scanCenter,
+ * because those are positioned absolute and would otherwise be pulled back
+ * into grid flow by `position: relative` and steal grid tracks.
+ */
+.label,
+.board > [data-coord] {
   position: relative;
   z-index: 1;
 }
