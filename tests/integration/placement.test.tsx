@@ -37,10 +37,17 @@ function placedCells(): HTMLElement[] {
   return Array.from(document.querySelectorAll('button[data-state="ship"]'));
 }
 
+/** Render <App /> and click through Home → Player 1 placement. */
+function renderInPlacement(): void {
+  render(<App />);
+  // App now starts at home; click "Begin" to enter placement.
+  fireEvent.click(screen.getByRole('button', { name: /begin placement/i }));
+}
+
 describe('PlacementScreen integration (CP2)', () => {
   it('Start button is disabled until the entire fleet is placed (#31)', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderInPlacement();
     expect(getStartButton()).toBeDisabled();
 
     await user.click(screen.getByRole('button', { name: /randomize fleet/i }));
@@ -48,7 +55,7 @@ describe('PlacementScreen integration (CP2)', () => {
   });
 
   it('Rotating updates the preview orientation (#32)', () => {
-    render(<App />);
+    renderInPlacement();
     // Carrier is pre-selected by BEGIN_PLACEMENT (length 5, default H).
     expect(selectedShipName()).toBe('Carrier');
 
@@ -67,7 +74,7 @@ describe('PlacementScreen integration (CP2)', () => {
 
   it('Randomize fills all 5 ships with legal placements (#33)', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderInPlacement();
     await user.click(screen.getByRole('button', { name: /randomize fleet/i }));
 
     const occupied = placedCells();
@@ -82,7 +89,7 @@ describe('PlacementScreen integration (CP2)', () => {
 
   it('Reset clears all placements and disables Start again (#34)', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderInPlacement();
     await user.click(screen.getByRole('button', { name: /randomize fleet/i }));
     expect(placedCells().length).toBeGreaterThan(0);
 
@@ -92,7 +99,7 @@ describe('PlacementScreen integration (CP2)', () => {
   });
 
   it('Clicking a cell with a selected ship places it on the board', () => {
-    render(<App />);
+    renderInPlacement();
     // Carrier (5, H) at A1 → cells (0,0)..(0,4)
     fireEvent.click(getCell(0, 0));
     for (let c = 0; c < 5; c++) {
@@ -102,7 +109,7 @@ describe('PlacementScreen integration (CP2)', () => {
   });
 
   it('Clicking on an invalid placement surfaces an error message and does not place', () => {
-    render(<App />);
+    renderInPlacement();
     // Carrier H length 5 at (0,7) → cols 7..11, out of bounds.
     fireEvent.click(getCell(0, 7));
     expect(placedCells()).toHaveLength(0);
@@ -110,7 +117,7 @@ describe('PlacementScreen integration (CP2)', () => {
   });
 
   it('Pressing R rotates the selected ship', () => {
-    render(<App />);
+    renderInPlacement();
     fireEvent.pointerEnter(getCell(0, 0));
     expect(getCell(0, 4).dataset.state).toBe('preview-valid'); // H
 
@@ -120,7 +127,7 @@ describe('PlacementScreen integration (CP2)', () => {
   });
 
   it('After placing one ship, selection auto-advances to the next unplaced ship', () => {
-    render(<App />);
+    renderInPlacement();
     // Place Carrier
     fireEvent.click(getCell(0, 0));
     // Battleship should now be selected (auto-advance)
@@ -129,7 +136,7 @@ describe('PlacementScreen integration (CP2)', () => {
 
   it('Clicking a cell after randomize+manually clearing selection shows an error', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderInPlacement();
     // Randomize fills the fleet AND clears the selection (selectedShipId=null).
     await user.click(screen.getByRole('button', { name: /randomize fleet/i }));
     expect(selectedShipName()).toBeNull();
@@ -147,20 +154,20 @@ describe('PlacementScreen integration (CP2)', () => {
   });
 
   it('Cell aria-labels include coordinate and state', () => {
-    render(<App />);
+    renderInPlacement();
     expect(getCell(0, 0).getAttribute('aria-label')).toBe('A1');
     fireEvent.click(getCell(0, 0));
     expect(getCell(0, 0).getAttribute('aria-label')).toBe('A1, your ship');
   });
 
   it('Reset button is disabled when no ships have been placed', () => {
-    render(<App />);
+    renderInPlacement();
     const reset = screen.getByRole('button', { name: /reset fleet/i });
     expect(reset).toBeDisabled();
   });
 
   it('Selected ship is reflected with aria-pressed=true in the dock', () => {
-    render(<App />);
+    renderInPlacement();
     const carrier = dockButton('Carrier')!;
     expect(carrier.getAttribute('aria-pressed')).toBe('true');
     const battleship = dockButton('Battleship')!;
@@ -171,7 +178,7 @@ describe('PlacementScreen integration (CP2)', () => {
   });
 
   it('Player 1 ship dock label appears (player scoping for CP5 readiness)', () => {
-    render(<App />);
+    renderInPlacement();
     expect(within(screen.getByLabelText(/player 1 ship dock/i)).getByText(/fleet/i)).toBeInTheDocument();
   });
 });

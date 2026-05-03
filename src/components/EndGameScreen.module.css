@@ -1,0 +1,117 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5);
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.banner {
+  text-align: center;
+  padding: var(--space-5) var(--space-4);
+  border-radius: var(--radius-3);
+  background: var(--color-panel);
+  border: 1px solid var(--color-panel-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.banner[data-result='win'] {
+  border-color: var(--color-glow-strong);
+  box-shadow: 0 0 0 1px var(--color-glow) inset;
+}
+
+.banner[data-result='loss'] {
+  border-color: rgba(255, 94, 94, 0.6);
+  box-shadow: 0 0 0 1px rgba(255, 94, 94, 0.4) inset;
+}
+
+.bannerKicker {
+  margin: 0;
+  font-family: var(--font-mono);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-glow);
+  font-size: 0.78rem;
+}
+
+.banner[data-result='loss'] .bannerKicker {
+  color: var(--color-hit);
+}
+
+.bannerTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-glow-strong);
+}
+
+.bannerSub {
+  margin: 0;
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+  color: rgba(185, 212, 232, 0.7);
+}
+
+.boards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+.boardCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.boardTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  letter-spacing: 0.14em;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  color: var(--color-glow);
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.action {
+  padding: 12px 24px;
+  border-radius: var(--radius-2);
+  border: 1px solid var(--color-panel-border);
+  background: rgba(8, 22, 41, 0.6);
+  color: var(--color-mist);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.action:hover {
+  border-color: var(--color-glow);
+}
+
+.actionPrimary {
+  background: linear-gradient(180deg, rgba(127, 220, 224, 0.5), rgba(64, 134, 162, 0.6));
+  color: var(--color-deep);
+  border-color: var(--color-glow-strong);
+}
+
+@media (max-width: 900px) {
+  .boards {
+    grid-template-columns: 1fr;
+  }
+}

@@ -24,6 +24,14 @@ export const SHIP_LENGTH: Readonly<Record<ShipId, number>> = {
   destroyer: 2,
 };
 
+export const SHIP_NAME: Readonly<Record<ShipId, string>> = {
+  carrier: 'Carrier',
+  battleship: 'Battleship',
+  cruiser: 'Cruiser',
+  submarine: 'Submarine',
+  destroyer: 'Destroyer',
+};
+
 export const TOTAL_SHIP_CELLS = FLEET.reduce((sum, s) => sum + s.length, 0); // 17
 
 export const PLAYER_IDS: readonly PlayerId[] = ['p1', 'p2'];
