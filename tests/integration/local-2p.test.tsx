@@ -228,5 +228,8 @@ describe('Local 2P privacy + handoff (CP5)', () => {
     fireEvent.click(screen.getByRole('button', { name: /start a rematch/i }));
     // Rematch returns to Player 1 placement.
     expect(screen.getByRole('button', { name: /player 1 ready/i })).toBeInTheDocument();
-  }, 30000);
+    // The full 2P game involves up to 200 shots + 200 handoff confirmations,
+    // each yielding to React's microtask queue. On slower CI runners this
+    // approaches but should not exceed 90s; locally it completes in ~20s.
+  }, 90000);
 });
