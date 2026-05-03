@@ -80,7 +80,7 @@ function CellInner({
         data-coord={`${coord.row},${coord.col}`}
         data-state={state}
       >
-        {(state === 'hit' || state === 'sunk') && <span className={styles.marker} />}
+        {(state === 'hit' || state === 'sunk') && <span className={`${styles.marker} ${styles.hit}`} />}
         {state === 'miss' && <span className={`${styles.marker} ${styles.miss}`} />}
       </span>
     );
@@ -100,7 +100,7 @@ function CellInner({
       onPointerLeave={() => onPointerLeave?.(coord)}
       onKeyDown={(e) => onKeyDown?.(coord, e)}
     >
-      {(state === 'hit' || state === 'sunk') && <span className={styles.marker} />}
+      {(state === 'hit' || state === 'sunk') && <span className={`${styles.marker} ${styles.hit}`} />}
       {state === 'miss' && <span className={`${styles.marker} ${styles.miss}`} />}
     </button>
   );
