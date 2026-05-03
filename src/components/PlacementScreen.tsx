@@ -34,11 +34,14 @@ export function PlacementScreen({
   const [hover, setHover] = useState<Coord | null>(null);
   const [error, setError] = useState<string>('');
 
-  // Clear hover/error when the player or selected ship changes.
+  // Clear hover/error when the player or selected ship changes. Note that we
+  // intentionally do NOT depend on `orientation`: rotating in-place must
+  // preserve the hovered cell so the live preview updates immediately
+  // (the previewCells useMemo recomputes on orientation change).
   useEffect(() => {
     setHover(null);
     setError('');
-  }, [player, selectedShipId, orientation]);
+  }, [player, selectedShipId]);
 
   // Listen for keyboard rotation while in placement.
   useEffect(() => {
