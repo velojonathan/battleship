@@ -95,11 +95,12 @@ export function PlacementScreen({
         orientation,
       });
       setError('');
-      // Auto-advance to the next unplaced ship if any.
-      const next = nextUnplacedShip(fleet, selectedShipId);
-      dispatch({ type: 'SELECT_SHIP', player, shipId: next });
+      // The engine auto-advances selectedShipId to the next unplaced ship
+      // (in fleet order) and resets orientation to that ship's stored
+      // orientation, keeping selectedShipId and orientation consistent.
+      // We intentionally do NOT dispatch SELECT_SHIP here.
     },
-    [dispatch, player, selectedShipId, orientation, ownBoard, fleet],
+    [dispatch, player, selectedShipId, orientation, ownBoard],
   );
 
   const onSelectShip = useCallback(
@@ -194,14 +195,4 @@ export function PlacementScreen({
   );
 }
 
-function nextUnplacedShip(
-  fleet: ReadonlyArray<{ id: ShipId; origin: unknown }>,
-  current: ShipId,
-): ShipId | null {
-  const idx = fleet.findIndex((s) => s.id === current);
-  for (let i = 1; i <= fleet.length; i++) {
-    const next = fleet[(idx + i) % fleet.length];
-    if (next && next.origin === null) return next.id;
-  }
-  return null;
-}
+
