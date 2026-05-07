@@ -1,0 +1,44 @@
+.board {
+  --label-size: clamp(20px, 3.2vw, 32px);
+  display: inline-grid;
+  grid-template-columns: var(--label-size) repeat(var(--board-cols, 10), var(--board-cell, 38px));
+  grid-template-rows: var(--label-size) repeat(var(--board-rows, 10), var(--board-cell, 38px));
+  gap: 2px;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(10, 28, 51, 0.85), rgba(4, 10, 24, 0.95));
+  border: 1px solid rgba(127, 220, 224, 0.22);
+  border-radius: 14px;
+  box-shadow:
+    inset 0 0 0 1px rgba(127, 220, 224, 0.05),
+    0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: rgba(207, 231, 239, 0.6);
+  user-select: none;
+}
+
+.corner {
+  background: transparent;
+}
+
+.targetingHint {
+  margin-top: 8px;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, monospace);
+  font-size: 0.7rem;
+  color: rgba(207, 231, 239, 0.55);
+}
+
+@media (max-width: 480px) {
+  .board {
+    --board-cell: clamp(28px, 9vw, 36px);
+    padding: 10px;
+    gap: 2px;
+  }
+}

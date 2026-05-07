@@ -1,0 +1,110 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 28px clamp(16px, 4vw, 48px);
+  width: min(1200px, 100%);
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.title {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: 0.06em;
+  color: var(--color-glow-strong, #c1f5fa);
+  margin: 0;
+}
+
+.subtitle {
+  font-family: var(--font-mono, ui-monospace);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  color: rgba(207, 231, 239, 0.7);
+  margin: 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.boardArea {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.error {
+  min-height: 1.2em;
+  font-family: var(--font-mono, ui-monospace);
+  font-size: 0.85rem;
+  color: rgba(255, 145, 145, 0.95);
+  letter-spacing: 0.04em;
+}
+
+.error.empty {
+  visibility: hidden;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.startButton {
+  padding: 12px 22px;
+  background: linear-gradient(180deg, rgba(127, 220, 224, 0.4), rgba(64, 134, 162, 0.55));
+  border: 1px solid var(--color-glow-strong, #c1f5fa);
+  border-radius: 12px;
+  color: var(--color-deep, #040a18);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform var(--motion-fast, 120ms) ease,
+    box-shadow var(--motion-fast, 120ms) ease;
+  touch-action: manipulation;
+}
+
+.startButton:hover:not(:disabled),
+.startButton:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(127, 220, 224, 0.35);
+  outline: none;
+}
+
+.startButton:focus-visible {
+  outline: 2px solid var(--color-glow-strong, #c1f5fa);
+  outline-offset: 2px;
+}
+
+.startButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
+.helper {
+  font-family: var(--font-mono, ui-monospace);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: rgba(207, 231, 239, 0.5);
+}
