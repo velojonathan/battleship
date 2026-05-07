@@ -10,6 +10,7 @@ import type {
 import { Board } from './Board';
 import { BattleLog } from './BattleLog';
 import { FleetStatus } from './FleetStatus';
+import { QuitButton } from './QuitButton';
 import type { CellState } from './Cell';
 import styles from './GameScreen.module.css';
 
@@ -194,6 +195,11 @@ export function GameScreen({
         >
           {turnLabel}
         </div>
+        <QuitButton
+          dispatch={dispatch}
+          confirm
+          confirmText="Quit to home? The current battle will end."
+        />
       </header>
 
       <div className={styles.boards}>

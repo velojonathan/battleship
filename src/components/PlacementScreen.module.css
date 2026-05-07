@@ -13,6 +13,14 @@
   gap: 6px;
 }
 
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .title {
   font-family: var(--font-display, Georgia, serif);
   font-size: clamp(1.6rem, 3vw, 2.2rem);

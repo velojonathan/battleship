@@ -3,6 +3,7 @@ import { coordKey, shipFootprint } from '../game/coordinates';
 import { canPlaceShip, getShip } from '../game/placement';
 import type { Action, Coord, GameState, PlayerId, ShipId } from '../game/types';
 import { Board } from './Board';
+import { QuitButton } from './QuitButton';
 import { ShipDock } from './ShipDock';
 import type { CellState } from './Cell';
 import styles from './PlacementScreen.module.css';
@@ -146,12 +147,23 @@ export function PlacementScreen({
       : 'Select a ship from the dock, then tap a cell to place it. Press R to rotate.'
     : `Tap a cell to place ${getShip(fleet, selectedShipId).name} (length ${getShip(fleet, selectedShipId).length}). R to rotate.`;
 
+  // Only confirm-prompt the player if they've already placed at least one ship
+  // (i.e. they've actually invested effort that quitting would lose).
+  const placedSomething = fleet.some((s) => s.origin !== null);
+
   return (
     <section className={styles.screen} aria-label="Ship placement">
       <header className={styles.header}>
-        <h1 className={styles.title}>
-          {player === 'p1' ? playerState.name : playerState.name} — Place your fleet
-        </h1>
+        <div className={styles.titleRow}>
+          <h1 className={styles.title}>
+            {player === 'p1' ? playerState.name : playerState.name} — Place your fleet
+          </h1>
+          <QuitButton
+            dispatch={dispatch}
+            confirm={placedSomething}
+            confirmText="Quit to home? Your placement will be lost."
+          />
+        </div>
         <p className={styles.subtitle}>{helper}</p>
       </header>
       <div className={styles.layout}>
