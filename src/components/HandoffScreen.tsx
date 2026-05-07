@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { allShipsPlaced } from '../game/placement';
 import type { Action, GameState } from '../game/types';
+import { QuitButton } from './QuitButton';
 import styles from './HandoffScreen.module.css';
 
 export interface HandoffScreenProps {
@@ -99,6 +100,13 @@ export function HandoffScreen({ state, dispatch }: HandoffScreenProps): JSX.Elem
         >
           I&apos;m ready
         </button>
+        <div className={styles.cardFooter}>
+          <QuitButton
+            dispatch={dispatch}
+            confirm
+            confirmText="Quit to home? The current 2P session will end."
+          />
+        </div>
       </div>
     </section>
   );

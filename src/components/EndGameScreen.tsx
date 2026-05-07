@@ -42,9 +42,20 @@ export function EndGameScreen({
   }, [dispatch]);
 
   const winner = state.winner;
-  const youWon = winner === viewer;
+  const isLocal2P = state.mode === 'local-2p';
+  // In Local 2P, both players are at the same device — there is no single
+  // "viewer" perspective. Show neutral copy ("Player X wins") for both, and
+  // suppress the misleading "Victory" banner that would otherwise be shown
+  // because viewer auto-resets to the player who fired the winning shot.
+  const youWon = !isLocal2P && winner === viewer;
   const winnerName =
     winner === null ? 'No one' : state.players[winner].name;
+  const bannerKicker = isLocal2P ? 'Battle complete' : youWon ? 'Victory' : 'Defeat';
+  const bannerResult: 'win' | 'loss' | 'neutral' = isLocal2P
+    ? 'neutral'
+    : youWon
+      ? 'win'
+      : 'loss';
 
   // Each board reveals everyone's ships at game-over.
   const p1 = state.players.p1;
@@ -54,8 +65,8 @@ export function EndGameScreen({
 
   return (
     <section className={styles.screen} aria-label="End of battle">
-      <div className={styles.banner} data-result={youWon ? 'win' : 'loss'}>
-        <p className={styles.bannerKicker}>{youWon ? 'Victory' : 'Defeat'}</p>
+      <div className={styles.banner} data-result={bannerResult}>
+        <p className={styles.bannerKicker}>{bannerKicker}</p>
         <h1 className={styles.bannerTitle}>{winnerName} wins</h1>
         <p className={styles.bannerSub}>
           {state.turnNumber} turn{state.turnNumber === 1 ? '' : 's'} ·{' '}

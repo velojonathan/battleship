@@ -1,0 +1,31 @@
+.quit {
+  appearance: none;
+  background: rgba(8, 22, 41, 0.55);
+  border: 1px solid rgba(127, 220, 224, 0.25);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-family: var(--font-mono, ui-monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(207, 231, 239, 0.78);
+  cursor: pointer;
+  transition:
+    border-color var(--motion-fast, 120ms) ease,
+    color var(--motion-fast, 120ms) ease,
+    background-color var(--motion-fast, 120ms) ease;
+  touch-action: manipulation;
+}
+
+.quit:hover,
+.quit:focus-visible {
+  border-color: var(--color-glow-strong, #c1f5fa);
+  color: var(--color-glow-strong, #c1f5fa);
+  background: rgba(8, 22, 41, 0.85);
+  outline: none;
+}
+
+.quit:focus-visible {
+  outline: 2px solid var(--color-glow-strong, #c1f5fa);
+  outline-offset: 2px;
+}
