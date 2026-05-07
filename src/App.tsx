@@ -4,6 +4,7 @@ import { HomeScreen } from './components/HomeScreen';
 import { PlacementScreen } from './components/PlacementScreen';
 import { GameScreen } from './components/GameScreen';
 import { EndGameScreen } from './components/EndGameScreen';
+import { HandoffScreen } from './components/HandoffScreen';
 import styles from './App.module.css';
 
 export interface AppProps {
@@ -18,6 +19,10 @@ export default function App({ aiThinkMs, resolveMs }: AppProps = {}): JSX.Elemen
   // Drives the AI's turn during solo play. Cleans itself up on phase change.
   useAITurn({ state, dispatch, thinkMs: aiThinkMs, resolveMs });
 
+  // In Local 2P, the active viewer follows whichever player's turn it is.
+  // In Solo, the human is always p1 (the AI is p2).
+  const viewer = state.mode === 'local-2p' ? state.currentTurn : 'p1';
+
   return (
     <main className={styles.shell}>
       {state.phase === 'home' && <HomeScreen state={state} dispatch={dispatch} />}
@@ -27,17 +32,19 @@ export default function App({ aiThinkMs, resolveMs }: AppProps = {}): JSX.Elemen
       {state.phase === 'setup-player-two' && (
         <PlacementScreen state={state} dispatch={dispatch} player="p2" />
       )}
+      {state.phase === 'handoff' && (
+        <HandoffScreen state={state} dispatch={dispatch} />
+      )}
       {state.phase === 'in-progress' && (
-        <GameScreen state={state} dispatch={dispatch} viewer="p1" resolveMs={resolveMs} />
+        <GameScreen
+          state={state}
+          dispatch={dispatch}
+          viewer={viewer}
+          resolveMs={resolveMs}
+        />
       )}
       {state.phase === 'game-over' && (
-        <EndGameScreen state={state} dispatch={dispatch} viewer="p1" />
-      )}
-      {state.phase === 'handoff' && (
-        <div className={styles.placeholder}>
-          <h1>Handoff</h1>
-          <p>Local 2P handoff arrives in Checkpoint 5.</p>
-        </div>
+        <EndGameScreen state={state} dispatch={dispatch} viewer={viewer} />
       )}
     </main>
   );

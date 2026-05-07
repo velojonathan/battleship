@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Action, Difficulty, GameState, Mode } from '../game/types';
 import styles from './HomeScreen.module.css';
 
@@ -27,6 +27,18 @@ export function HomeScreen({
 }: HomeScreenProps): JSX.Element {
   const [p1Name, setP1Name] = useState(state.players.p1.name);
   const [p2Name, setP2Name] = useState(state.players.p2.name);
+
+  // When the user toggles between Solo and Local 2P, the engine swaps p2's
+  // identity (AI Commander <-> Player 2). Re-sync ONLY the p2 input so the
+  // local state matches the engine. P1 is never touched on SET_MODE, so we
+  // must NOT clobber whatever the user has typed there.
+  const prevModeRef = useRef(state.mode);
+  useEffect(() => {
+    if (prevModeRef.current !== state.mode) {
+      setP2Name(state.players.p2.name);
+      prevModeRef.current = state.mode;
+    }
+  }, [state.mode, state.players.p2.name]);
 
   const onSetMode = useCallback(
     (mode: Mode) => {
