@@ -22,6 +22,46 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/*
+ * Slow-moving ocean swell layer attached to <body>::before. Pure CSS,
+ * no JavaScript, no images. Disabled under prefers-reduced-motion.
+ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -10%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 60% 30% at 30% 20%,
+      rgba(127, 220, 224, 0.06),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 50% 25% at 70% 80%,
+      rgba(127, 220, 224, 0.05),
+      transparent 60%
+    ),
+    repeating-linear-gradient(
+      18deg,
+      rgba(127, 220, 224, 0.02) 0 2px,
+      transparent 2px 32px
+    );
+  filter: blur(0.6px);
+  animation: swell 22s ease-in-out infinite alternate;
+}
+
+@keyframes swell {
+  from {
+    transform: translate3d(-1.2%, -0.6%, 0) scale(1.02);
+  }
+  to {
+    transform: translate3d(1.4%, 0.8%, 0) scale(1.04);
+  }
 }
 
 a {
@@ -52,4 +92,10 @@ h1 {
   text-transform: uppercase;
   color: var(--color-glow-strong);
   font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
 }

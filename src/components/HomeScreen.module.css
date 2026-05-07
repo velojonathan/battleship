@@ -31,6 +31,9 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-glow-strong);
+  text-shadow:
+    0 0 18px rgba(127, 220, 224, 0.35),
+    0 0 4px rgba(193, 245, 250, 0.4);
 }
 
 .tagline {
@@ -160,23 +163,35 @@
 }
 
 .beginButton {
+  position: relative;
   align-self: center;
   min-width: 180px;
   padding: 14px 28px;
   border-radius: var(--radius-3);
   border: 1px solid var(--color-glow-strong);
-  background: linear-gradient(180deg, rgba(127, 220, 224, 0.45), rgba(64, 134, 162, 0.6));
+  background: linear-gradient(180deg, rgba(127, 220, 224, 0.5), rgba(64, 134, 162, 0.7));
   color: var(--color-deep);
   font-family: var(--font-display);
   font-size: 1.1rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: filter 0.15s ease;
+  transition:
+    filter 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
+  box-shadow:
+    0 0 0 1px rgba(193, 245, 250, 0.4) inset,
+    0 0 24px rgba(127, 220, 224, 0.25);
 }
 
-.beginButton:hover {
-  filter: brightness(1.1);
+.beginButton:hover,
+.beginButton:focus-visible {
+  filter: brightness(1.12);
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgba(193, 245, 250, 0.55) inset,
+    0 0 36px rgba(127, 220, 224, 0.45);
 }
 
 .beginButton:active {

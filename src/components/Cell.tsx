@@ -80,8 +80,15 @@ function CellInner({
         data-coord={`${coord.row},${coord.col}`}
         data-state={state}
       >
-        {(state === 'hit' || state === 'sunk') && <span className={`${styles.marker} ${styles.hit}`} />}
-        {state === 'miss' && <span className={`${styles.marker} ${styles.miss}`} />}
+        {state === 'hit' && (
+          <span className={`${styles.marker} ${styles.hit}`} aria-hidden="true" />
+        )}
+        {state === 'sunk' && (
+          <span className={`${styles.marker} ${styles.sunkMarker}`} aria-hidden="true" />
+        )}
+        {state === 'miss' && (
+          <span className={`${styles.marker} ${styles.miss}`} aria-hidden="true" />
+        )}
       </span>
     );
   }
@@ -100,8 +107,15 @@ function CellInner({
       onPointerLeave={() => onPointerLeave?.(coord)}
       onKeyDown={(e) => onKeyDown?.(coord, e)}
     >
-      {(state === 'hit' || state === 'sunk') && <span className={`${styles.marker} ${styles.hit}`} />}
-      {state === 'miss' && <span className={`${styles.marker} ${styles.miss}`} />}
+      {state === 'hit' && (
+        <span className={`${styles.marker} ${styles.hit}`} aria-hidden="true" />
+      )}
+      {state === 'sunk' && (
+        <span className={`${styles.marker} ${styles.sunkMarker}`} aria-hidden="true" />
+      )}
+      {state === 'miss' && (
+        <span className={`${styles.marker} ${styles.miss}`} aria-hidden="true" />
+      )}
     </button>
   );
 }

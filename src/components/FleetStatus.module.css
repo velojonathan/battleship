@@ -45,12 +45,19 @@
 
 .ship {
   display: grid;
-  grid-template-columns: minmax(80px, 1fr) auto auto;
+  grid-template-columns: 22px minmax(80px, 1fr) auto auto;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   font-family: var(--font-mono);
   font-size: 0.84rem;
   color: var(--color-mist);
+}
+
+.silhouette {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
 }
 
 .name {

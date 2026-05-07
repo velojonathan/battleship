@@ -1,5 +1,6 @@
 .board {
   --label-size: clamp(20px, 3.2vw, 32px);
+  position: relative;
   display: inline-grid;
   grid-template-columns: var(--label-size) repeat(var(--board-cols, 10), var(--board-cell, 38px));
   grid-template-rows: var(--label-size) repeat(var(--board-rows, 10), var(--board-cell, 38px));
@@ -11,6 +12,110 @@
   box-shadow:
     inset 0 0 0 1px rgba(127, 220, 224, 0.05),
     0 12px 32px rgba(0, 0, 0, 0.5);
+  isolation: isolate;
+}
+
+/* Targeting variant: sonar-style scope. */
+.board.targeting {
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(127, 220, 224, 0.05) 0%,
+      rgba(8, 26, 48, 0.92) 60%,
+      rgba(4, 12, 26, 0.98) 100%
+    );
+  border-color: rgba(127, 220, 224, 0.35);
+  box-shadow:
+    inset 0 0 0 1px rgba(127, 220, 224, 0.12),
+    inset 0 0 80px rgba(127, 220, 224, 0.08),
+    0 14px 36px rgba(0, 0, 0, 0.55);
+}
+
+/* Own-fleet variant: deeper, more "armor plate" feel. */
+.board.own {
+  background: linear-gradient(135deg, rgba(20, 48, 77, 0.9), rgba(2, 10, 22, 0.98));
+  border-color: rgba(160, 200, 230, 0.18);
+}
+
+/* Sonar concentric rings + center pin. */
+.scanRing,
+.scanCenter {
+  pointer-events: none;
+  position: absolute;
+  inset: 14px;
+  z-index: 0;
+  border-radius: 8px;
+}
+
+.scanRing {
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      transparent 0%,
+      transparent 14%,
+      rgba(127, 220, 224, 0.06) 14.4%,
+      transparent 14.8%,
+      transparent 28%,
+      rgba(127, 220, 224, 0.06) 28.4%,
+      transparent 28.8%,
+      transparent 42%,
+      rgba(127, 220, 224, 0.06) 42.4%,
+      transparent 42.8%,
+      transparent 56%,
+      rgba(127, 220, 224, 0.05) 56.4%,
+      transparent 56.8%
+    );
+  mix-blend-mode: screen;
+}
+
+.scanCenter {
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(127, 220, 224, 0.18) 0%,
+      rgba(127, 220, 224, 0.04) 30%,
+      transparent 60%
+    );
+  mix-blend-mode: screen;
+  opacity: 0.65;
+}
+
+/* Slow rotating sweep over the targeting grid. */
+.scanSweep {
+  pointer-events: none;
+  position: absolute;
+  inset: 14px;
+  z-index: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(127, 220, 224, 0) 0deg,
+    rgba(127, 220, 224, 0.18) 12deg,
+    rgba(127, 220, 224, 0) 60deg,
+    rgba(127, 220, 224, 0) 360deg
+  );
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  animation: sweep 6s linear infinite;
+}
+
+@keyframes sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * Cells & labels need to sit above the absolutely-positioned overlay layers.
+ * IMPORTANT: this rule must NOT match .scanRing/.scanSweep/.scanCenter,
+ * because those are positioned absolute and would otherwise be pulled back
+ * into grid flow by `position: relative` and steal grid tracks.
+ */
+.label,
+.board > [data-coord] {
+  position: relative;
+  z-index: 1;
 }
 
 .label {
@@ -22,6 +127,10 @@
   letter-spacing: 0.08em;
   color: rgba(207, 231, 239, 0.6);
   user-select: none;
+}
+
+.board.targeting .label {
+  color: rgba(127, 220, 224, 0.7);
 }
 
 .corner {
@@ -40,5 +149,17 @@
     --board-cell: clamp(28px, 9vw, 36px);
     padding: 10px;
     gap: 2px;
+  }
+  .scanRing,
+  .scanSweep,
+  .scanCenter {
+    inset: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scanSweep {
+    animation: none;
+    opacity: 0.25;
   }
 }

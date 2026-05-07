@@ -6,6 +6,8 @@ import styles from './Board.module.css';
 
 const COLUMN_LABELS = 'ABCDEFGHIJ'.split('');
 
+export type BoardVariant = 'placement' | 'own' | 'targeting';
+
 export interface BoardProps {
   /** Board model used for sizing. */
   board: OwnBoard;
@@ -22,6 +24,12 @@ export interface BoardProps {
   onCellKeyDown?: (coord: Coord, event: KeyboardEvent<HTMLButtonElement>) => void;
   className?: string;
   ariaLabel?: string;
+  /**
+   * Visual variant. 'targeting' adds a sonar-style scan overlay & glow.
+   * 'own' applies a slightly different palette so the two boards are
+   * obviously different to the player at a glance. Default is 'placement'.
+   */
+  variant?: BoardVariant;
 }
 
 export function Board({
@@ -36,6 +44,7 @@ export function Board({
   onCellKeyDown,
   className = '',
   ariaLabel,
+  variant = 'placement',
 }: BoardProps): JSX.Element {
   const size = board.size;
   const style: CSSProperties = {
@@ -44,13 +53,23 @@ export function Board({
   };
   const rows = Array.from({ length: size }, (_, i) => i);
   const cols = Array.from({ length: size }, (_, i) => i);
+  const variantClass =
+    variant === 'targeting' ? styles.targeting : variant === 'own' ? styles.own : '';
   return (
     <div
-      className={[styles.board, className].filter(Boolean).join(' ')}
+      className={[styles.board, variantClass, className].filter(Boolean).join(' ')}
       style={style}
       role="grid"
       aria-label={ariaLabel ?? 'Battleship board'}
+      data-variant={variant}
     >
+      {variant === 'targeting' && (
+        <>
+          <span aria-hidden="true" className={styles.scanRing} />
+          <span aria-hidden="true" className={styles.scanSweep} />
+          <span aria-hidden="true" className={styles.scanCenter} />
+        </>
+      )}
       <span aria-hidden="true" className={`${styles.label} ${styles.corner}`} />
       {cols.map((c) => (
         <span key={`col-${c}`} aria-hidden="true" className={styles.label}>

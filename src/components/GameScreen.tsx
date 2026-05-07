@@ -206,6 +206,7 @@ export function GameScreen({
             cellDisabled={targetingCellDisabled}
             onCellClick={onFire}
             ariaLabel={`Fire targeting board against ${them.name}`}
+            variant="targeting"
           />
         </div>
         <div className={styles.boardCol}>
@@ -216,6 +217,7 @@ export function GameScreen({
             cellState={ownCellState}
             cellLabel={ownCellLabel}
             ariaLabel={`${me.name} fleet board`}
+            variant="own"
           />
         </div>
       </div>
