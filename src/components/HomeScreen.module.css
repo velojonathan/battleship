@@ -1,0 +1,184 @@
+.screen {
+  margin: auto;
+  max-width: 760px;
+  width: 100%;
+  padding: var(--space-6) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.hero {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  letter-spacing: 0.32em;
+  color: var(--color-glow);
+  font-size: 0.78rem;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 4vw, 3.2rem);
+  margin: 0;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-glow-strong);
+}
+
+.tagline {
+  font-family: var(--font-mono);
+  color: rgba(185, 212, 232, 0.78);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.panel {
+  background: var(--color-panel);
+  border: 1px solid var(--color-panel-border);
+  border-radius: var(--radius-3);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  backdrop-filter: blur(6px);
+}
+
+.field {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.legend {
+  font-family: var(--font-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.74rem;
+  color: var(--color-glow);
+  padding: 0;
+}
+
+.options {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-2);
+  background: rgba(8, 22, 41, 0.55);
+  border: 1px solid var(--color-panel-border);
+  color: var(--color-mist);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.1s ease;
+}
+
+.option:hover {
+  border-color: var(--color-glow);
+}
+
+.option:active {
+  transform: translateY(1px);
+}
+
+.optionSelected {
+  border-color: var(--color-glow-strong);
+  background: linear-gradient(
+    180deg,
+    rgba(127, 220, 224, 0.18),
+    rgba(127, 220, 224, 0.04)
+  );
+  box-shadow: 0 0 0 1px var(--color-glow) inset;
+}
+
+.optionLabel {
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+}
+
+.optionSubLabel {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: rgba(185, 212, 232, 0.7);
+  letter-spacing: 0.08em;
+}
+
+.names {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.nameLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: rgba(185, 212, 232, 0.78);
+}
+
+.nameInput {
+  appearance: none;
+  background: rgba(4, 10, 24, 0.7);
+  border: 1px solid var(--color-panel-border);
+  border-radius: var(--radius-1);
+  padding: 10px 12px;
+  color: var(--color-glow-strong);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+}
+
+.nameInput:focus-visible {
+  border-color: var(--color-glow);
+  outline: 2px solid var(--color-glow);
+  outline-offset: 1px;
+}
+
+.beginButton {
+  align-self: center;
+  min-width: 180px;
+  padding: 14px 28px;
+  border-radius: var(--radius-3);
+  border: 1px solid var(--color-glow-strong);
+  background: linear-gradient(180deg, rgba(127, 220, 224, 0.45), rgba(64, 134, 162, 0.6));
+  color: var(--color-deep);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.beginButton:hover {
+  filter: brightness(1.1);
+}
+
+.beginButton:active {
+  transform: translateY(1px);
+}

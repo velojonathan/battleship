@@ -1,0 +1,129 @@
+.screen {
+  display: grid;
+  grid-template-columns: 1fr minmax(280px, 360px);
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'header header'
+    'boards sidebar';
+  gap: var(--space-5);
+  padding: var(--space-5);
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1280px;
+  min-height: 100%;
+}
+
+.header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.scoreboard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.scoreSlot {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-panel);
+  border: 1px solid var(--color-panel-border);
+  border-radius: var(--radius-2);
+  padding: 8px 14px;
+  min-width: 140px;
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+}
+
+.scoreSlotActive {
+  border-color: var(--color-glow-strong);
+  box-shadow: 0 0 0 1px var(--color-glow) inset;
+}
+
+.scoreName {
+  font-size: 1.05rem;
+  color: var(--color-glow-strong);
+}
+
+.scoreSub {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  color: rgba(185, 212, 232, 0.6);
+  text-transform: uppercase;
+}
+
+.divider {
+  font-family: var(--font-mono);
+  letter-spacing: 0.18em;
+  color: rgba(185, 212, 232, 0.6);
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.turnBanner {
+  font-family: var(--font-display);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 1rem;
+  padding: 10px 18px;
+  background: rgba(8, 22, 41, 0.55);
+  border: 1px solid var(--color-panel-border);
+  border-radius: var(--radius-2);
+  color: var(--color-glow-strong);
+}
+
+.turnBanner[data-turn='theirs'] {
+  border-color: rgba(255, 181, 71, 0.5);
+  color: var(--color-amber);
+}
+
+.boards {
+  grid-area: boards;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  align-content: start;
+}
+
+.boardCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.boardTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  letter-spacing: 0.14em;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  color: var(--color-glow);
+  font-weight: 500;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+}
+
+@media (max-width: 900px) {
+  .screen {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'header'
+      'boards'
+      'sidebar';
+  }
+  .boards {
+    grid-template-columns: 1fr;
+  }
+}
