@@ -167,6 +167,20 @@ describe('Solo gameplay flow (CP3)', () => {
     });
   });
 
+  it('Return Home from game over fully resets state — no orphan AI shot fires after', async () => {
+    await startSoloGame();
+    await playUntilGameOver();
+    expect(screen.getByLabelText(/end of battle/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /return to home/i }));
+    expect(screen.getByRole('button', { name: /begin placement/i })).toBeInTheDocument();
+    // Wait a bit and confirm the home screen is still rendered (no AI dispatch
+    // fires after the user has returned home).
+    await act(async () => {
+      await new Promise((res) => setTimeout(res, 50));
+    });
+    expect(screen.getByRole('button', { name: /begin placement/i })).toBeInTheDocument();
+  }, 30000);
+
   it('Choosing Easy difficulty on home propagates into the game state', async () => {
     render(<App aiThinkMs={0} resolveMs={0} />);
     fireEvent.click(screen.getByRole('button', { name: /^easy/i }));
