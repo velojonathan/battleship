@@ -26,6 +26,12 @@
   gap: var(--space-4, 16px);
 }
 
+.cardFooter {
+  margin-top: var(--space-2, 8px);
+  display: flex;
+  justify-content: center;
+}
+
 .kicker {
   margin: 0;
   font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
