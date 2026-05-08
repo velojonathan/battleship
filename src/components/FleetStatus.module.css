@@ -57,7 +57,26 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 22px;
   height: 28px;
+  /*
+   * ShipSvg renders at an intrinsic height of (width × ship.length) — a
+   * 5-cell carrier at width=18 is ~90px tall and was visibly crowding the
+   * panel header. Clip the overflow so the silhouette is a window onto the
+   * ship's bow rather than a sprawling decoration.
+   */
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.silhouette > svg {
+  /*
+   * Constrain the SVG to the silhouette's box. preserveAspectRatio="xMidYMid
+   * meet" (SVG default) keeps the ship recognizable while the height/width
+   * attributes set on <ShipSvg /> get overridden here.
+   */
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .name {
