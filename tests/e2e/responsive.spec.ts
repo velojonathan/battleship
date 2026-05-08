@@ -62,22 +62,19 @@ for (const vp of VIEWPORTS) {
       ).toBeVisible();
       await expectNoHorizontalOverflow(page, `${vp.label} placement`);
 
-      // Randomize so the board is full, then start the battle.
-      // On very narrow widths (320/360) we just assert overflow at placement;
-      // the game-screen layout collapses to a single column at <=900 and is
-      // already covered by other widths.
-      if (vp.width >= 768) {
-        await randomizeAndStart(page, 'Begin battle');
-        await expect(
-          page.getByRole('grid', { name: /Fire targeting board/i }),
-        ).toBeVisible();
-        await expectNoHorizontalOverflow(page, `${vp.label} in-progress`);
+      // Randomize and start the battle, then verify in-progress + post-fire.
+      // Covers the narrow widths (320/360) too, which previously slipped past
+      // the e2e suite and let the in-game scoreboard overflow on a 320px phone.
+      await randomizeAndStart(page, 'Begin battle');
+      await expect(
+        page.getByRole('grid', { name: /Fire targeting board/i }),
+      ).toBeVisible();
+      await expectNoHorizontalOverflow(page, `${vp.label} in-progress`);
 
-        // Fire one shot to exercise the post-shot layout.
-        const targeting = page.getByRole('grid', { name: /Fire targeting board/i });
-        await targeting.locator('button[data-coord]').first().click();
-        await expectNoHorizontalOverflow(page, `${vp.label} post-fire`);
-      }
+      // Fire one shot to exercise the post-shot layout.
+      const targeting = page.getByRole('grid', { name: /Fire targeting board/i });
+      await targeting.locator('button[data-coord]').first().click();
+      await expectNoHorizontalOverflow(page, `${vp.label} post-fire`);
 
       // Console must be clean across the run.
       expect(getErrors()).toEqual([]);

@@ -59,6 +59,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .headerActions {
@@ -208,6 +210,27 @@
   }
   .boards {
     grid-template-columns: 1fr;
+  }
+}
+
+/*
+ * Narrow phone widths (<=380px): the two scoreboard slots + divider hit the
+ * 272px content area before any other element. Shrink padding, allow each
+ * slot to grow/shrink to fit, and let the scoreboard wrap so the layout
+ * never produces horizontal scroll on a 320px phone.
+ */
+@media (max-width: 380px) {
+  .screen {
+    padding: var(--space-3);
+    gap: var(--space-4);
+  }
+  .scoreSlot {
+    min-width: 0;
+    padding: 6px 10px;
+    flex: 1 1 0;
+  }
+  .scoreName {
+    font-size: 0.95rem;
   }
 }
 
