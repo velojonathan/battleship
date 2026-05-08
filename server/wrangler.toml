@@ -1,0 +1,52 @@
+#:schema node_modules/wrangler/config-schema.json
+# Cloudflare Worker + Durable Object config for Online 2P Lite.
+#
+# Manual deployment only — there is intentionally no GitHub Action that runs
+# `wrangler deploy`. The user owns the Cloudflare account and runs deploys
+# from their own machine after `wrangler login`. No API tokens are committed.
+
+name = "battleship-room"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+# Required so DurableObject from "cloudflare:workers" is available with the
+# proper class-export semantics (RPC).
+compatibility_flags = ["nodejs_compat"]
+
+# CORS / CSP defaults are unset; the Worker handles them in code so the same
+# config works in dev and prod.
+workers_dev = true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Durable Object bindings
+# ─────────────────────────────────────────────────────────────────────────────
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "RoomDO"
+
+# SQLite-backed Durable Object. This is Cloudflare's recommended storage model
+# for new DO classes (see
+# https://developers.cloudflare.com/durable-objects/best-practices/access-durable-objects-storage/).
+# We use the key/value Storage API on top of the SQLite backend in PR1.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RoomDO"]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Environment-specific overrides
+# ─────────────────────────────────────────────────────────────────────────────
+# Production environment is the default ("[env.production]" is omitted because
+# Cloudflare uses the top-level config when no `--env` flag is passed).
+#
+# A separate "staging" environment uses a different Worker name so it deploys
+# alongside production without conflicts. The Pages preview environment can
+# point its VITE_WS_URL at the staging Worker's *.workers.dev URL.
+[env.staging]
+name = "battleship-room-staging"
+
+[[env.staging.durable_objects.bindings]]
+name = "ROOM"
+class_name = "RoomDO"
+
+[[env.staging.migrations]]
+tag = "v1"
+new_sqlite_classes = ["RoomDO"]

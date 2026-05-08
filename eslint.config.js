@@ -14,6 +14,10 @@ export default tseslint.config(
       'test-results',
       'node_modules',
       '.vite',
+      // The Cloudflare Worker workspace lives in `server/` and has its own
+      // tooling (separate package.json, tsconfig, vitest pool). Keep the
+      // frontend's eslint flat config focused on the frontend.
+      'server/**',
     ],
   },
   {
