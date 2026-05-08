@@ -1,8 +1,22 @@
 import { useCallback, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
 import { coordKey } from '../game/coordinates';
-import type { Coord, OwnBoard } from '../game/types';
+import type { Coord, Orientation, OwnBoard, ShipId } from '../game/types';
 import { Cell, type CellState } from './Cell';
+import { ShipSvg } from './ShipSvg';
 import styles from './Board.module.css';
+
+/**
+ * A fully-sunk ship rendered as an overlay on top of the grid. Only data
+ * derivable from public state should be passed here for a targeting board;
+ * for the own board, the player's own sunk ships are obviously visible to
+ * themselves.
+ */
+export interface SunkShipOverlay {
+  id: ShipId;
+  origin: Coord;
+  orientation: Orientation;
+  length: number;
+}
 
 const COLUMN_LABELS = 'ABCDEFGHIJ'.split('');
 
@@ -61,6 +75,12 @@ export interface BoardProps {
    * obviously different to the player at a glance. Default is 'placement'.
    */
   variant?: BoardVariant;
+  /**
+   * Fully-sunk ships to render as a tilted/faded ShipSvg overlay over their
+   * grid footprint. For 'targeting' boards, only pass publicly-known sunk
+   * ships (privacy: never expose un-sunk opponent positions).
+   */
+  sunkShips?: readonly SunkShipOverlay[];
 }
 
 export function Board({
@@ -76,6 +96,7 @@ export function Board({
   className = '',
   ariaLabel,
   variant = 'placement',
+  sunkShips,
 }: BoardProps): JSX.Element {
   const size = board.size;
   const style: CSSProperties = {
@@ -147,6 +168,48 @@ export function Board({
           onCellKeyDown={handleCellKey}
         />
       ))}
+      {sunkShips && sunkShips.length > 0 && (
+        <SunkOverlayLayer ships={sunkShips} variant={variant} />
+      )}
+    </div>
+  );
+}
+
+interface SunkOverlayLayerProps {
+  ships: readonly SunkShipOverlay[];
+  variant: BoardVariant;
+}
+
+/**
+ * Absolutely-positioned layer that sits on top of the grid and renders a
+ * tilted, faded ShipSvg over each fully-sunk ship's footprint. The layer is
+ * pointer-events: none so it never intercepts shot clicks. Each overlay is
+ * positioned in CSS using grid-track variables so it lines up with the
+ * underlying cells without measuring the DOM.
+ */
+function SunkOverlayLayer({ ships, variant }: SunkOverlayLayerProps): JSX.Element {
+  return (
+    <div className={styles.sunkLayer} aria-hidden="true" data-variant={variant}>
+      {ships.map((ship) => {
+        const isHorizontal = ship.orientation === 'H';
+        const overlayStyle: CSSProperties = {
+          ['--sunk-row' as never]: ship.origin.row,
+          ['--sunk-col' as never]: ship.origin.col,
+          ['--sunk-len' as never]: ship.length,
+        };
+        return (
+          <span
+            key={ship.id}
+            className={`${styles.sunkOverlay} ${isHorizontal ? styles.sunkH : styles.sunkV}`}
+            style={overlayStyle}
+            data-ship={ship.id}
+            data-orientation={ship.orientation}
+            data-testid={`sunk-overlay-${ship.id}`}
+          >
+            <ShipSvg shipId={ship.id} length={ship.length} state="sunk" width={28} />
+          </span>
+        );
+      })}
     </div>
   );
 }

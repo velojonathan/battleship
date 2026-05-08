@@ -128,3 +128,24 @@
   background: var(--color-sunk);
   border-color: rgba(255, 181, 71, 0.7);
 }
+
+/*
+ * D2 sinking visual: the row silhouette tilts and fades when the ship is
+ * fully sunk. Pure CSS, no DOM changes.
+ */
+.sunk .silhouette {
+  opacity: 0.55;
+  transform: rotate(-12deg) translateY(1px);
+  transform-origin: 50% 100%;
+  transition:
+    opacity var(--motion-slow, 600ms) ease-out,
+    transform var(--motion-slow, 600ms) ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sunk .silhouette {
+    transform: none;
+    transition: none;
+    opacity: 0.55;
+  }
+}

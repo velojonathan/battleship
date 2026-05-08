@@ -170,3 +170,88 @@
     opacity: 0.25;
   }
 }
+
+/*
+ * Sunk-ship overlay layer. Sits on top of the grid (z-index above cells) but
+ * does not intercept clicks (pointer-events: none). Individual overlays are
+ * positioned via grid-track math: cells start at column 2 / row 2 (after the
+ * 1-track label gutter) so we add 2 to the ship origin to get its grid-line.
+ *
+ * IMPORTANT: this layer must NEVER include positions for un-sunk ships on a
+ * targeting board — privacy is enforced at the data layer in GameScreen.
+ */
+.sunkLayer {
+  pointer-events: none;
+  position: absolute;
+  inset: 14px;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: var(--label-size) repeat(var(--board-cols, 10), var(--board-cell, 38px));
+  grid-template-rows: var(--label-size) repeat(var(--board-rows, 10), var(--board-cell, 38px));
+  gap: 2px;
+}
+
+.sunkOverlay {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Default to a horizontal ship: span N columns, 1 row. */
+  grid-column: calc(var(--sunk-col) + 2) / span var(--sunk-len);
+  grid-row: calc(var(--sunk-row) + 2) / span 1;
+  opacity: 0.78;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+  /*
+   * Sinking visual: a slow tilt + slight downward drop, animated once on
+   * mount. We respect prefers-reduced-motion below.
+   */
+  transform-origin: 50% 100%;
+  animation: sunkSettle var(--motion-slow, 600ms) ease-out both;
+}
+
+.sunkOverlay > svg {
+  /* Make the SVG fill the overlay cell-span without exceeding it. */
+  max-width: 100%;
+  max-height: 100%;
+  height: 100%;
+  width: auto;
+}
+
+.sunkOverlay.sunkH > svg {
+  /* Horizontal ships: rotate the vertical-by-default ShipSvg 90° so the
+     hull lays along the row. The SVG is authored as bow-up; bow ends up to
+     the right of the row (matches ship.origin → col, col+1, ...). */
+  transform: rotate(90deg);
+  transform-origin: 50% 50%;
+  width: auto;
+  height: 60%;
+}
+
+.sunkOverlay.sunkV {
+  grid-column: calc(var(--sunk-col) + 2) / span 1;
+  grid-row: calc(var(--sunk-row) + 2) / span var(--sunk-len);
+}
+
+.sunkOverlay.sunkV > svg {
+  width: 60%;
+  height: auto;
+}
+
+/* Slight slant to communicate "sinking", plus a faint settle. */
+@keyframes sunkSettle {
+  from {
+    opacity: 0.05;
+    transform: translateY(-4px) rotate(-2deg);
+  }
+  to {
+    opacity: 0.78;
+    transform: translateY(2px) rotate(-6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sunkOverlay {
+    animation: none;
+    transform: none;
+    opacity: 0.7;
+  }
+}

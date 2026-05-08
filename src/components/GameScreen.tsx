@@ -86,6 +86,36 @@ export function GameScreen({
   // Own board: opponent's shots against viewer.
   const theirShotsIndex = useMemo(() => indexShots(them.shotsTaken), [them.shotsTaken]);
 
+  // Sunk-ship overlays for the own board: trivially derived from viewer's
+  // own fleet (they obviously know where their own ships are).
+  const ownSunkShips = useMemo(
+    () =>
+      me.fleet
+        .filter((s) => s.sunk && s.origin !== null)
+        .map((s) => ({
+          id: s.id,
+          origin: s.origin as Coord,
+          orientation: s.orientation,
+          length: s.length,
+        })),
+    [me.fleet],
+  );
+  // Sunk-ship overlays for the targeting board: ONLY publicly-known sunk
+  // ships, identified by ship.sunk===true. Privacy: un-sunk opponent ships
+  // are NOT included, so their cells/origin/orientation are never rendered.
+  const publicSunkShips = useMemo(
+    () =>
+      them.fleet
+        .filter((s) => s.sunk && s.origin !== null)
+        .map((s) => ({
+          id: s.id,
+          origin: s.origin as Coord,
+          orientation: s.orientation,
+          length: s.length,
+        })),
+    [them.fleet],
+  );
+
   const myTurn = state.currentTurn === viewer;
   const myCanFire =
     state.phase === 'in-progress' &&
@@ -273,6 +303,7 @@ export function GameScreen({
             onCellClick={onFire}
             ariaLabel={`Fire targeting board against ${them.name}`}
             variant="targeting"
+            sunkShips={publicSunkShips}
           />
         </div>
         <div className={styles.boardCol}>
@@ -284,6 +315,7 @@ export function GameScreen({
             cellLabel={ownCellLabel}
             ariaLabel={`${me.name} fleet board`}
             variant="own"
+            sunkShips={ownSunkShips}
           />
         </div>
       </div>
