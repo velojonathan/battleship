@@ -184,6 +184,11 @@ export class RoomDO extends DurableObject<Env> {
     const seat = this.sockets.get(ws);
     this.sockets.delete(ws);
     if (seat) {
+      // Defense in depth: if another live socket is still bound to the same
+      // seat (e.g. we just bumped this one in handleHello/handleReconnect),
+      // do NOT broadcast `disconnected` — the seat is in fact still online.
+      // This pairs with `evictOtherSocketsForSeat` below.
+      if (this.isSeatConnected(seat)) return;
       // Notify the OTHER seat (if any) that we're now disconnected. We do NOT
       // delete seat assignments — the player can reconnect within the room
       // TTL with their token.
@@ -244,6 +249,10 @@ export class RoomDO extends DurableObject<Env> {
     const updated: SeatRecord = { ...record, displayName: sanitized };
     await this.ctx.storage.put(seatKey(seat), updated);
 
+    // Bump any pre-existing socket for this seat. This handles the rare case
+    // where the host opened a second tab (or a malicious double-`hello`)
+    // before the first socket had a chance to close.
+    this.evictOtherSocketsForSeat(ws, seat);
     await this.attachSocket(ws, seat);
   }
 
@@ -266,13 +275,33 @@ export class RoomDO extends DurableObject<Env> {
     // If a previous socket for this seat is still attached, close it — only
     // one connection per seat at a time. (Tab-duplication avoidance: the
     // older tab gets bumped.)
+    this.evictOtherSocketsForSeat(ws, seat);
+    await this.attachSocket(ws, seat);
+  }
+
+  /**
+   * Close (and forget) any other live socket that is currently attached to
+   * the given seat. The replacement socket (`keep`) is left untouched. We
+   * close with code 1000 + reason "replaced" so the bumped tab can show a
+   * clean "you opened another tab, this one is now stale" state.
+   *
+   * IMPORTANT: removing entries from `this.sockets` BEFORE issuing
+   * `close()` matters. The `close()` will eventually fire `webSocketClose`,
+   * but by then the entry is gone, so `webSocketClose`'s `isSeatConnected`
+   * check will (correctly) see the new socket and skip the disconnected
+   * broadcast — preventing a spurious "p1 disconnected" notice to p2.
+   */
+  private evictOtherSocketsForSeat(keep: WebSocket, seat: SeatId): void {
     for (const [otherWs, otherSeat] of this.sockets) {
-      if (otherSeat === seat && otherWs !== ws) {
-        otherWs.close(1000, 'replaced');
+      if (otherSeat === seat && otherWs !== keep) {
         this.sockets.delete(otherWs);
+        try {
+          otherWs.close(1000, 'replaced');
+        } catch {
+          /* already closed; ignore */
+        }
       }
     }
-    await this.attachSocket(ws, seat);
   }
 
   private async handleJoin(ws: WebSocket, name: string | undefined): Promise<void> {

@@ -318,5 +318,81 @@ describe('WebSocket — protocol hardening', () => {
   });
 });
 
+describe('WebSocket — duplicate seat sockets', () => {
+  // Regression: previously `handleHello` did not bump a pre-existing socket
+  // for the same seat, so a host opening a second tab (or a malicious
+  // double-`hello`) would accumulate two sockets in the seat map. When one
+  // closed, the DO would broadcast `connectionChanged: disconnected` for
+  // the seat to ALL surviving sockets — including the still-live duplicate
+  // and the opponent — falsely indicating the seat had gone offline.
+  it('a second `hello` for an authenticated seat replaces the first socket without spurious disconnect notices', async () => {
+    const created = await postRoom();
+
+    // First host socket authenticates normally.
+    const first = openSocket(created.code);
+    await first.ready;
+    await send(first, { type: 'hello', seat: 'p1', token: created.token });
+    expect((await first.next()).type).toBe('roomSnapshot');
+
+    // p2 joins so we can observe what the opponent sees.
+    const guest = openSocket(created.code);
+    await guest.ready;
+    await send(guest, { type: 'join', name: 'Guest' });
+    const assigned = (await guest.next()) as PlayerAssigned;
+    expect(assigned.type).toBe('playerAssigned');
+    await guest.next(); // snapshot
+    // The host receives `opponentJoined` for p2.
+    expect((await first.next()).type).toBe('opponentJoined');
+
+    // Second host socket sends `hello` with the SAME valid token.
+    const second = openSocket(created.code);
+    await second.ready;
+    await send(second, { type: 'hello', seat: 'p1', token: created.token });
+    expect((await second.next()).type).toBe('roomSnapshot');
+
+    // Critical assertion: p2 must NOT see p1 flap to disconnected. The seat
+    // is still online — the new socket simply replaced the old one. Give
+    // the runtime a tick to surface any spurious broadcast before checking.
+    const racey: Promise<ServerMessage | null> = Promise.race([
+      guest.next(),
+      new Promise<null>((r) => setTimeout(() => r(null), 200)),
+    ]);
+    const seenByGuest = await racey;
+    if (seenByGuest && seenByGuest.type === 'connectionChanged') {
+      expect(seenByGuest.conn).not.toBe('disconnected');
+    }
+    // Either way, p1 should be reported as connected in any new snapshot.
+    await send(guest, { type: 'leave' });
+  });
+
+  it('reconnect bumps an existing socket for the same seat', async () => {
+    const created = await postRoom();
+    // Establish an authenticated p1.
+    const first = openSocket(created.code);
+    await first.ready;
+    await send(first, { type: 'hello', seat: 'p1', token: created.token });
+    expect((await first.next()).type).toBe('roomSnapshot');
+
+    // Reconnect from a different tab using the same token.
+    const second = openSocket(created.code);
+    await second.ready;
+    await send(second, { type: 'reconnect', seat: 'p1', token: created.token });
+    expect((await second.next()).type).toBe('roomSnapshot');
+
+    // The first tab's socket should be closed by the runtime. We can't
+    // directly observe the close event with this harness, but we can
+    // confirm the second tab is the one receiving traffic by triggering
+    // a join from p2 and checking that it routes to the new socket.
+    const guest = openSocket(created.code);
+    await guest.ready;
+    await send(guest, { type: 'join', name: 'Guest' });
+    const assigned = (await guest.next()) as PlayerAssigned;
+    expect(assigned.type).toBe('playerAssigned');
+    await guest.next();
+    const opponentJoined = await second.next();
+    expect(opponentJoined.type).toBe('opponentJoined');
+  });
+});
+
 // Used to silence eslint about unused env import in the typing block above.
 void env;
