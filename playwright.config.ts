@@ -17,10 +17,14 @@ export default defineConfig({
     {
       name: 'chromium-desktop',
       use: { ...devices['Desktop Chrome'] },
+      // Run all specs except the mobile-specific smoke test.
+      testIgnore: /mobile\.spec\.ts$/,
     },
     {
       name: 'chromium-mobile',
       use: { ...devices['Pixel 7'] },
+      // Mobile project runs only the mobile smoke test, to keep the suite fast.
+      testMatch: /mobile\.spec\.ts$/,
     },
   ],
   webServer: {
