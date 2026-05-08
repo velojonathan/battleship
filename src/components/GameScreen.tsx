@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { coordKey } from '../game/coordinates';
 import type {
   Action,
@@ -7,10 +7,13 @@ import type {
   PlayerId,
   ShotResult,
 } from '../game/types';
+import type { AudioBus, CueId } from '../audio';
+import { useAudio } from '../hooks/useAudio';
 import { Board } from './Board';
 import { BattleLog } from './BattleLog';
 import { FleetStatus } from './FleetStatus';
 import { QuitButton } from './QuitButton';
+import { SoundToggle } from './SoundToggle';
 import type { CellState } from './Cell';
 import styles from './GameScreen.module.css';
 
@@ -26,6 +29,17 @@ export interface GameScreenProps {
   resolveMs?: number;
   /** Override timestamp source for tests. */
   now?: () => number;
+  /**
+   * Inject an AudioBus for tests; falls back to a real, lazy-created bus.
+   * Allows tests to spy on cue calls without touching real Web Audio.
+   */
+  audioBus?: AudioBus;
+}
+
+function shotCue(outcome: ShotResult['outcome']): CueId {
+  if (outcome === 'miss') return 'miss';
+  if (outcome === 'sunk') return 'sunk';
+  return 'hit';
 }
 
 function otherOf(id: PlayerId): PlayerId {
@@ -47,10 +61,25 @@ export function GameScreen({
   viewer,
   resolveMs = 700,
   now = () => Date.now(),
+  audioBus,
 }: GameScreenProps): JSX.Element {
   const opponent = otherOf(viewer);
   const me = state.players[viewer];
   const them = state.players[opponent];
+
+  const audio = useAudio({ bus: audioBus });
+  // Track the last log entry id we've already played a cue for, so the
+  // effect doesn't re-fire on every parent re-render or under React 18
+  // StrictMode's double-invocation. Initialized lazily on first render so
+  // freshly mounted (post-handoff) GameScreens don't replay historical shots.
+  const lastShotIdRef = useRef<string | null>(null);
+  const lastShotIdInitialized = useRef(false);
+  if (!lastShotIdInitialized.current) {
+    const lastEntry = state.log[state.log.length - 1];
+    lastShotIdRef.current = lastEntry?.id ?? null;
+    lastShotIdInitialized.current = true;
+  }
+  const gameOverPlayedRef = useRef(false);
 
   // Targeting board: shots viewer has fired against opponent.
   const myShotsIndex = useMemo(() => indexShots(me.shotsTaken), [me.shotsTaken]);
@@ -90,6 +119,30 @@ export function GameScreen({
     dispatch,
     resolveMs,
   ]);
+
+  // Play a sound cue when a new shot lands in the log. We dedupe via the log
+  // entry id so React StrictMode's double-effect cannot double-play, and so
+  // remounting GameScreen (post-handoff) doesn't replay historical shots.
+  useEffect(() => {
+    const lastEntry = state.log[state.log.length - 1];
+    if (!lastEntry) return;
+    if (lastEntry.id === lastShotIdRef.current) return;
+    lastShotIdRef.current = lastEntry.id;
+    audio.play(shotCue(lastEntry.outcome));
+  }, [state.log, audio]);
+
+  // Play a single game-over cue on the transition into 'game-over'.
+  useEffect(() => {
+    if (state.phase !== 'game-over') {
+      // Reset for the next round so a rematch correctly fires the cue again.
+      gameOverPlayedRef.current = false;
+      return;
+    }
+    if (gameOverPlayedRef.current) return;
+    gameOverPlayedRef.current = true;
+    const won = state.winner === viewer;
+    audio.play(won ? 'gameOverWin' : 'gameOverLoss');
+  }, [state.phase, state.winner, viewer, audio]);
 
   const onFire = useCallback(
     (coord: Coord) => {
@@ -195,11 +248,18 @@ export function GameScreen({
         >
           {turnLabel}
         </div>
-        <QuitButton
-          dispatch={dispatch}
-          confirm
-          confirmText="Quit to home? The current battle will end."
-        />
+        <div className={styles.headerActions}>
+          <SoundToggle
+            muted={audio.muted}
+            available={audio.available}
+            onToggle={audio.toggleMuted}
+          />
+          <QuitButton
+            dispatch={dispatch}
+            confirm
+            confirmText="Quit to home? The current battle will end."
+          />
+        </div>
       </header>
 
       <div className={styles.boards}>
