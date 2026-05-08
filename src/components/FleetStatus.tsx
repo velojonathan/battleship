@@ -1,4 +1,4 @@
-import { SHIP_NAME } from '../game/constants';
+import { SHIP_NAME, TOTAL_SHIP_CELLS } from '../game/constants';
 import type { GameState, PlayerId, Ship, ShipId } from '../game/types';
 import { ShipSvg } from './ShipSvg';
 import styles from './FleetStatus.module.css';
@@ -30,9 +30,14 @@ function deriveOwn(ships: readonly Ship[]): DerivedShip[] {
 }
 
 /**
- * Derive the *publicly known* status of the opponent's fleet.
- * Only sunk ships are revealed; un-sunk ships show "??" for their hit count.
- * This means we never leak hidden info even if a future bug rendered this twice.
+ * Derive the *publicly known* status of the opponent's fleet for per-row display.
+ * Only sunk ships are revealed; un-sunk ships are shown as "Active" with no hit count.
+ * This preserves anti-cheat: per-ship hit counts stay hidden until the ship is sunk.
+ *
+ * Note: the *aggregate* segment-health number rendered in the header is derived
+ * from the source fleet (cells actually hit). That number equals the count of
+ * the viewer's hit/sunk shots, which is already public information visible on
+ * the board. Surfacing the aggregate adds no new info.
  */
 function deriveOpponent(ships: readonly Ship[]): DerivedShip[] {
   return ships.map((s) => ({
@@ -44,6 +49,12 @@ function deriveOpponent(ships: readonly Ship[]): DerivedShip[] {
   }));
 }
 
+function totalCellsLost(ships: readonly Ship[]): number {
+  let n = 0;
+  for (const s of ships) n += s.hits.length;
+  return n;
+}
+
 export function FleetStatus({
   state,
   player,
@@ -52,21 +63,22 @@ export function FleetStatus({
 }: FleetStatusProps): JSX.Element {
   const ships = state.players[player].fleet;
   const derived = reveal ? deriveOwn(ships) : deriveOpponent(ships);
-  const totalHits = derived.reduce((acc, s) => acc + s.hits, 0);
-  const totalCells = derived.reduce((acc, s) => acc + s.length, 0);
+  // Both panels use the same segment-health metric: cells afloat / TOTAL_SHIP_CELLS.
+  // Privacy: the aggregate count for the opponent fleet equals the viewer's own
+  // hit/sunk shot count (already in the DOM as cell data-state="hit|sunk").
+  const cellsLost = totalCellsLost(ships);
+  const cellsAfloat = TOTAL_SHIP_CELLS - cellsLost;
+  const allSunk = cellsAfloat === 0;
+  const summaryText = `${cellsAfloat}/${TOTAL_SHIP_CELLS} ${allSunk ? 'SUNK' : 'AFLOAT'}`;
   const heading = title ?? `${state.players[player].name} fleet`;
-  const ariaLabel = reveal
-    ? `${heading}, ${totalHits} of ${totalCells} cells damaged`
-    : `${heading}, ${derived.filter((s) => s.sunk).length} of ${derived.length} ships sunk`;
+  const ariaLabel = `${heading}, ${cellsAfloat} of ${TOTAL_SHIP_CELLS} cells afloat`;
 
   return (
     <section className={styles.panel} aria-label={ariaLabel}>
       <header className={styles.header}>
         <h2 className={styles.title}>{heading}</h2>
-        <span className={styles.summary}>
-          {reveal
-            ? `${totalCells - totalHits}/${totalCells} afloat`
-            : `${derived.filter((s) => !s.sunk).length}/${derived.length} active`}
+        <span className={styles.summary} data-summary="segment-health">
+          {summaryText}
         </span>
       </header>
       <ul className={styles.list}>

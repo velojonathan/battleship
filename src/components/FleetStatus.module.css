@@ -57,7 +57,26 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 22px;
   height: 28px;
+  /*
+   * ShipSvg renders at an intrinsic height of (width × ship.length) — a
+   * 5-cell carrier at width=18 is ~90px tall and was visibly crowding the
+   * panel header. Clip the overflow so the silhouette is a window onto the
+   * ship's bow rather than a sprawling decoration.
+   */
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.silhouette > svg {
+  /*
+   * Constrain the SVG to the silhouette's box. preserveAspectRatio="xMidYMid
+   * meet" (SVG default) keeps the ship recognizable while the height/width
+   * attributes set on <ShipSvg /> get overridden here.
+   */
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .name {
@@ -108,4 +127,25 @@
 .sunk .cell {
   background: var(--color-sunk);
   border-color: rgba(255, 181, 71, 0.7);
+}
+
+/*
+ * D2 sinking visual: the row silhouette tilts and fades when the ship is
+ * fully sunk. Pure CSS, no DOM changes.
+ */
+.sunk .silhouette {
+  opacity: 0.55;
+  transform: rotate(-12deg) translateY(1px);
+  transform-origin: 50% 100%;
+  transition:
+    opacity var(--motion-slow, 600ms) ease-out,
+    transform var(--motion-slow, 600ms) ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sunk .silhouette {
+    transform: none;
+    transition: none;
+    opacity: 0.55;
+  }
 }

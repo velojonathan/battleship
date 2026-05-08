@@ -13,6 +13,39 @@
   min-height: 100%;
 }
 
+/*
+ * Tighter sidebar at the awkward 901–1023 band so the boards keep room.
+ */
+@media (min-width: 901px) and (max-width: 1023px) {
+  .screen {
+    grid-template-columns: 1fr minmax(260px, 320px);
+    gap: var(--space-4);
+    padding: var(--space-4);
+  }
+}
+
+/*
+ * Laptop comfort: at 1100–1279 widen the sidebar so the two fleet panels
+ * + battle log breathe instead of stacking long.
+ */
+@media (min-width: 1100px) and (max-width: 1279px) {
+  .screen {
+    grid-template-columns: 1fr minmax(320px, 380px);
+  }
+}
+
+/*
+ * 14"/16" laptops (1280+) used to leave dead margin because of the 1280
+ * cap. Widen the cap and the sidebar so the layout fills the viewport
+ * naturally without forcing horizontal scroll on smaller monitors.
+ */
+@media (min-width: 1280px) {
+  .screen {
+    max-width: 1440px;
+    grid-template-columns: 1fr minmax(360px, 420px);
+  }
+}
+
 .header {
   grid-area: header;
   display: flex;
@@ -26,6 +59,15 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.headerActions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
 }
 
 .scoreSlot {
@@ -127,12 +169,14 @@
 .boards {
   grid-area: boards;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--space-5);
   align-content: start;
+  min-width: 0;
 }
 
 .boardCol {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -166,5 +210,38 @@
   }
   .boards {
     grid-template-columns: 1fr;
+  }
+}
+
+/*
+ * Narrow phone widths (<=380px): the two scoreboard slots + divider hit the
+ * 272px content area before any other element. Shrink padding, allow each
+ * slot to grow/shrink to fit, and let the scoreboard wrap so the layout
+ * never produces horizontal scroll on a 320px phone.
+ */
+@media (max-width: 380px) {
+  .screen {
+    padding: var(--space-3);
+    gap: var(--space-4);
+  }
+  .scoreSlot {
+    min-width: 0;
+    padding: 6px 10px;
+    flex: 1 1 0;
+  }
+  .scoreName {
+    font-size: 0.95rem;
+  }
+}
+
+/*
+ * Awkward small-/mid-laptop band (901–1499 px): two side-by-side 10×38
+ * boards + sidebar exceed the viewport. Stack the boards vertically here
+ * so the layout always fits without horizontal scroll. Sidebar still sits
+ * to the right because the screen-level grid rule above keeps the column.
+ */
+@media (min-width: 901px) and (max-width: 1499px) {
+  .boards {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
