@@ -153,14 +153,24 @@
 
 @media (max-width: 480px) {
   .board {
-    --board-cell: clamp(28px, 9vw, 36px);
-    padding: 10px;
-    gap: 2px;
+    --label-size: clamp(16px, 3.5vw, 24px);
+    --board-cell: clamp(22px, 7vw, 30px);
+    padding: 8px;
+    gap: 1px;
   }
   .scanRing,
   .scanSweep,
   .scanCenter {
-    inset: 10px;
+    inset: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .board {
+    --label-size: 16px;
+    --board-cell: clamp(20px, 6.5vw, 24px);
+    padding: 6px;
+    gap: 1px;
   }
 }
 
@@ -183,12 +193,26 @@
 .sunkLayer {
   pointer-events: none;
   position: absolute;
+  /* Match the parent's padding so grid tracks line up exactly with cells. */
   inset: 14px;
   z-index: 3;
   display: grid;
   grid-template-columns: var(--label-size) repeat(var(--board-cols, 10), var(--board-cell, 38px));
   grid-template-rows: var(--label-size) repeat(var(--board-rows, 10), var(--board-cell, 38px));
   gap: 2px;
+}
+
+@media (max-width: 480px) {
+  .sunkLayer {
+    inset: 8px;
+    gap: 1px;
+  }
+}
+
+@media (max-width: 360px) {
+  .sunkLayer {
+    inset: 6px;
+  }
 }
 
 .sunkOverlay {

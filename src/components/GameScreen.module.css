@@ -167,12 +167,14 @@
 .boards {
   grid-area: boards;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--space-5);
   align-content: start;
+  min-width: 0;
 }
 
 .boardCol {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -206,5 +208,17 @@
   }
   .boards {
     grid-template-columns: 1fr;
+  }
+}
+
+/*
+ * Awkward small-/mid-laptop band (901–1499 px): two side-by-side 10×38
+ * boards + sidebar exceed the viewport. Stack the boards vertically here
+ * so the layout always fits without horizontal scroll. Sidebar still sits
+ * to the right because the screen-level grid rule above keeps the column.
+ */
+@media (min-width: 901px) and (max-width: 1499px) {
+  .boards {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
