@@ -9,7 +9,18 @@ export type Phase =
   | 'in-progress'
   | 'game-over';
 
-export type Mode = 'solo' | 'local-2p';
+/**
+ * Game mode.
+ *
+ * - `solo`: local human vs AI
+ * - `local-2p`: pass-and-play on the same device (privacy via HandoffScreen)
+ * - `online-2p`: networked human vs human (PR1 ships only the lobby; placement
+ *   and gameplay land in subsequent PRs). For all reducer logic NOT specific
+ *   to handoff, online-2p is treated identically to local-2p (both seats are
+ *   human). The engine itself never opens a network connection — that's the
+ *   responsibility of the online client layer (`src/online/*`).
+ */
+export type Mode = 'solo' | 'local-2p' | 'online-2p';
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export type PlayerId = 'p1' | 'p2';
 export type Orientation = 'H' | 'V';

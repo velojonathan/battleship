@@ -1,0 +1,118 @@
+.lobby {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.intro {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--color-muted, rgba(220, 230, 240, 0.7));
+}
+
+.actions {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 540px) {
+  .actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border, rgba(120, 180, 220, 0.35));
+  border-radius: 0.5rem;
+  background: var(--color-panel, rgba(10, 25, 40, 0.7));
+}
+
+.actionTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.actionHelp {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-muted, rgba(220, 230, 240, 0.6));
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--color-border, rgba(120, 180, 220, 0.35));
+  border-radius: 0.35rem;
+  background: rgba(0, 10, 22, 0.6);
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.input::placeholder {
+  text-transform: uppercase;
+  color: rgba(180, 210, 230, 0.5);
+}
+
+.button {
+  flex: 0 0 auto;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--color-accent, #4fb3ff);
+  border-radius: 0.35rem;
+  background: var(--color-accent, #4fb3ff);
+  color: #001025;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.unavailable {
+  border: 1px solid rgba(255, 180, 100, 0.5);
+  background: rgba(60, 32, 8, 0.6);
+  color: rgba(255, 220, 180, 0.95);
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.unavailable strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.error {
+  border: 1px solid rgba(255, 100, 120, 0.55);
+  background: rgba(60, 16, 22, 0.6);
+  color: rgba(255, 200, 210, 0.95);
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.4rem;
+  font-size: 0.85rem;
+}

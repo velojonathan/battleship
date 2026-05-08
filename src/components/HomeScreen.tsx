@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { OnlineRoot } from '../online/OnlineRoot';
 import type { Action, Difficulty, GameState, Mode } from '../game/types';
 import styles from './HomeScreen.module.css';
 
@@ -12,6 +13,7 @@ export interface HomeScreenProps {
 const MODES: ReadonlyArray<{ id: Mode; label: string; sublabel: string }> = [
   { id: 'solo', label: 'Solo', sublabel: 'vs. AI Commander' },
   { id: 'local-2p', label: 'Local 2P', sublabel: 'pass-and-play' },
+  { id: 'online-2p', label: 'Online 2P', sublabel: 'play over the internet' },
 ];
 
 const DIFFICULTIES: ReadonlyArray<{ id: Difficulty; label: string; sublabel: string }> = [
@@ -89,6 +91,13 @@ export function HomeScreen({
           </div>
         </fieldset>
 
+        {state.mode === 'online-2p' && (
+          <fieldset className={styles.field} aria-label="Online 2P">
+            <legend className={styles.legend}>Online 2P</legend>
+            <OnlineRoot displayName={p1Name.trim() || state.players.p1.name} />
+          </fieldset>
+        )}
+
         {state.mode === 'solo' && (
           <fieldset className={styles.field} aria-label="AI difficulty">
             <legend className={styles.legend}>Difficulty</legend>
@@ -109,6 +118,7 @@ export function HomeScreen({
           </fieldset>
         )}
 
+        {state.mode !== 'online-2p' && (
         <fieldset className={styles.field} aria-label="Player names">
           <legend className={styles.legend}>Players</legend>
           <div className={styles.names}>
@@ -138,15 +148,18 @@ export function HomeScreen({
             )}
           </div>
         </fieldset>
+        )}
 
-        <button
-          type="button"
-          className={styles.beginButton}
-          onClick={onBegin}
-          aria-label="Begin placement"
-        >
-          Begin
-        </button>
+        {state.mode !== 'online-2p' && (
+          <button
+            type="button"
+            className={styles.beginButton}
+            onClick={onBegin}
+            aria-label="Begin placement"
+          >
+            Begin
+          </button>
+        )}
       </div>
     </section>
   );

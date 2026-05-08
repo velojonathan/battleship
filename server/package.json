@@ -1,0 +1,21 @@
+{
+  "name": "@battleship/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Online 2P Lite — Cloudflare Worker + Durable Object backend for Battleship rooms",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dev": "wrangler dev --local",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.5.31",
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "typescript": "~5.6.3",
+    "vitest": "2.1.6",
+    "wrangler": "^3.99.0"
+  }
+}
