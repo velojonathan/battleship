@@ -230,6 +230,48 @@ describe('GameScreen — game-over cue', () => {
     expect(bus.played.filter((c) => c === 'gameOverWin').length).toBe(1);
   });
 
+  // Regression: App.tsx renders GameScreen only while phase==='in-progress'
+  // and unmounts it the moment phase flips to 'game-over'. The engine sets
+  // `winner` during FIRE_SHOT (still phase='in-progress') and only flips
+  // phase on the next COMPLETE_TURN. So the cue MUST fire on the winning
+  // FIRE_SHOT, before COMPLETE_TURN unmounts the screen. If we ever regress
+  // to gating on `phase === 'game-over'`, this test would fail because the
+  // cue would never play in this realistic mount/unmount sequence.
+  it('fires the win cue on the winning FIRE_SHOT, before COMPLETE_TURN unmounts (App.tsx flow)', () => {
+    const bus = makeSpyBus();
+    let state = buildSoloInProgress();
+    const r = renderGame(state, 'p1', bus);
+
+    const cells = shipCellsOf(state, 'p2');
+    let ts = 0;
+    for (let i = 0; i < cells.length - 1; i++) {
+      state = { ...state, currentTurn: 'p1', inputLocked: false, phase: 'in-progress' };
+      state = reducer(state, { type: 'FIRE_SHOT', at: cells[i], ts: ++ts });
+      state = reducer(state, { type: 'COMPLETE_TURN' });
+      rerenderGame(r, state, 'p1', bus);
+    }
+    // Last FIRE_SHOT — the winning shot. After this, state.winner is set
+    // and state.phase is STILL 'in-progress' (App.tsx still has GameScreen
+    // mounted).
+    state = { ...state, currentTurn: 'p1', inputLocked: false, phase: 'in-progress' };
+    state = reducer(state, { type: 'FIRE_SHOT', at: cells[cells.length - 1], ts: ++ts });
+    expect(state.phase).toBe('in-progress');
+    expect(state.winner).toBe('p1');
+    rerenderGame(r, state, 'p1', bus);
+
+    // The win cue MUST have fired here, while GameScreen is still mounted.
+    expect(bus.played).toContain('gameOverWin');
+
+    // Now COMPLETE_TURN flips phase to 'game-over' and App.tsx would
+    // unmount GameScreen. Simulate by unmounting.
+    state = reducer(state, { type: 'COMPLETE_TURN' });
+    expect(state.phase).toBe('game-over');
+    r.unmount();
+
+    // Cue still played exactly once.
+    expect(bus.played.filter((c) => c === 'gameOverWin').length).toBe(1);
+  });
+
   it('plays "gameOverLoss" when viewer loses (transition into game-over)', () => {
     const bus = makeSpyBus();
     let state = buildSoloInProgress();

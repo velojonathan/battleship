@@ -161,9 +161,16 @@ export function GameScreen({
     audio.play(shotCue(lastEntry.outcome));
   }, [state.log, audio]);
 
-  // Play a single game-over cue on the transition into 'game-over'.
+  // Play a single game-over cue when a winner is set. We gate on `winner`
+  // rather than `phase === 'game-over'` because the engine sets `winner`
+  // during FIRE_SHOT (still phase='in-progress') and only transitions to
+  // 'game-over' on the next COMPLETE_TURN. App.tsx unmounts GameScreen the
+  // moment phase flips to 'game-over' — so by the time we'd see that phase
+  // here, this component would already be gone. Triggering on `winner !==
+  // null` fires the cue on the winning shot, while GameScreen is still
+  // mounted.
   useEffect(() => {
-    if (state.phase !== 'game-over') {
+    if (state.winner === null) {
       // Reset for the next round so a rematch correctly fires the cue again.
       gameOverPlayedRef.current = false;
       return;
@@ -172,7 +179,7 @@ export function GameScreen({
     gameOverPlayedRef.current = true;
     const won = state.winner === viewer;
     audio.play(won ? 'gameOverWin' : 'gameOverLoss');
-  }, [state.phase, state.winner, viewer, audio]);
+  }, [state.winner, viewer, audio]);
 
   const onFire = useCallback(
     (coord: Coord) => {
